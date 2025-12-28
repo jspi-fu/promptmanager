@@ -1,66 +1,66 @@
-## Testing
+## 测试
 
-### Automated Testing with Puppeteer
+### 使用 Puppeteer 进行自动化测试
 
-This project includes automated tests using **Puppeteer** and **Jest** to ensure the extension works as expected.
+本项目包含使用 **Puppeteer** 和 **Jest** 的自动化测试，以确保扩展按预期工作。
 
-#### How to Find the Tests
+#### 如何找到测试
 
-- All test files are located in the `tests` directory or follow the naming convention `*.test.js`.
-- The main test file for the extension is `index.test.js`.
+- 所有测试文件位于 `tests` 目录中，或遵循命名约定 `*.test.js`。
+- 扩展的主要测试文件是 `index.test.js`。
 
-#### Running the Tests
+#### 运行测试
 
-1. **Install Dependencies**  
-   Ensure all required dependencies are installed by running:
+1. **安装依赖**  
+   通过运行以下命令确保所有必需的依赖项都已安装：
 
    ```bash
    npm install
    ```
 
-2. **Run the Tests**
-   Use the following command to execute all tests:
+2. **运行测试**
+   使用以下命令执行所有测试：
 
    ```bash
    npm test
    ```
 
-3. **View Test Results**
-   After running the tests, you will see the results in the terminal. Each test will display whether it passed or failed, along with any error messages.
+3. **查看测试结果**
+   运行测试后，您将在终端中看到结果。每个测试将显示是否通过或失败，以及任何错误消息。
 
-#### Example Test
+#### 示例测试
 
-Here’s an example of what a test looks like in index.test.js:
+以下是 `index.test.js` 中测试的示例：
 
 ```javascript
 test("popup renders correctly", async () => {
   const page = await browser.newPage();
   await page.goto(`chrome-extension://${EXTENSION_ID}/popup.html`);
 
-  // Locate the element with tag <div> and class "link-container"
+  // 定位标签为 <div> 且类名为 "link-container" 的元素
   const linkContainer = await page.$("div.link-container");
   expect(linkContainer).not.toBeNull();
 
-  // Get all child <a> elements of that div
-  const childrenA = await linkContainer.$$("a");
+  // 获取该 div 的所有子 <a> 元素
+  const childrenA = linkContainer.$$("a");
   expect(childrenA.length).toBe(5);
 });
 ```
 
-### Additional Notes
+### 其他说明
 
-Tests are configured to run using Jest, so any file ending with .test.js will automatically be included.
-For more advanced testing, refer to the Puppeteer API documentation.
+测试配置为使用 Jest 运行，因此任何以 `.test.js` 结尾的文件都会自动包含在内。
+有关更高级的测试，请参阅 Puppeteer API 文档。
 
-To run a specific test, use the following command:
+要运行特定测试，请使用以下命令：
 ```
 npx jest tests/{example}.test.js 
 ```
 
-### Flat `tests/` Folder Structure
+### 扁平化 `tests/` 文件夹结构
 
 ```
 tests/
-├── index.test.js                # Demo Test
-└── element_selector.test.js     # Test Prompt Textarea for all supported LLMs 
+├── index.test.js                # 演示测试
+└── element_selector.test.js     # 测试所有支持的大语言模型的提示词文本区域
 ```
