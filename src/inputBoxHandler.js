@@ -97,12 +97,15 @@ class InputBoxHandler {
       console.log('Inserting prompt:', { content, inputBox, promptList });
       // COMMENT: Read setting that controls append vs overwrite behavior
       const disableOverwrite = await new Promise(resolve => {
-        try {
-          chrome.storage.local.get('disableOverwrite', data => {
-            if (chrome.runtime?.lastError) { resolve(false); return; }
-            resolve(Boolean(data?.disableOverwrite));
-          });
-        } catch (_) { resolve(false); }
+        chrome.storage.local.get('disableOverwrite', data => {
+          // COMMENT: 默认开启“追加模式”；仅当用户显式设置为 false 时才关闭
+          if (chrome.runtime?.lastError) { resolve(true); return; }
+          if (data && Object.prototype.hasOwnProperty.call(data, 'disableOverwrite')) {
+            resolve(Boolean(data.disableOverwrite));
+            return;
+          }
+          resolve(true);
+        });
       });
 
       if (inputBox.contentEditable === 'true') {

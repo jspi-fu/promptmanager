@@ -132,6 +132,10 @@ const SCROLLBAR_PERSIST_MS = 900;
 const HOT_CORNER_INDICATOR_SMALL_PX = 20;
 const HOT_CORNER_INDICATOR_LARGE_PX = 30;
 
+// COMMENT: 禁用“闲置自动收回”机制（由 PromptUI.Behaviors.startCloseTimer 控制）
+// 用户更偏好手动控制面板显示；同时也避免对话中途被收起影响体验
+window.PROMPT_DISABLE_AUTO_CLOSE = true;
+
 /* ---------------------------------------------------------------------------
  * [02] Types (JSDoc typedefs)
  * COMMENT: Shapes used across UI/Storage operations.
@@ -291,7 +295,7 @@ const PanelView = Object.freeze({
   EDIT: 'EDIT',
   SETTINGS: 'SETTINGS',
   HELP: 'HELP',
-  CHANGELOG: 'CHANGELOG',
+  CHAT: 'CHAT',
   VARIABLE_INPUT: 'VARIABLE_INPUT'
 });
 window.PanelView = PanelView;
@@ -335,7 +339,7 @@ const PanelRouter = (() => {
   };
 
   /**
-   * COMMENT: Shared factory for static info views so HELP/CHANGELOG stay consistent.
+   * COMMENT: Shared factory for static info views so HELP stays consistent.
    * @param {{ titleText: string, contentId: string, sourcePath: string }} options
    * @returns {HTMLElement}
    */
@@ -368,12 +372,191 @@ const PanelRouter = (() => {
       return container;
   };
 
+  /**
+   * COMMENT: Create chat interface for prompt generation
+   * @returns {HTMLElement}
+   */
+  const createChatView = () => {
+    const dark = isDarkMode();
+    const container = createEl('div', {
+      className: `opm-chat-container opm-${getMode()}`,
+      styles: {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1 1 auto',
+        minHeight: '0',
+        padding: '0',
+        position: 'relative'
+      }
+    });
+
+    // Header with title and settings icon
+    const header = createEl('div', {
+      className: `opm-chat-header opm-${getMode()}`,
+      styles: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '12px 16px',
+        borderBottom: `1px solid ${dark ? THEME_COLORS.darkBorder : THEME_COLORS.lightBorder}`,
+        position: 'relative'
+      }
+    });
+
+    const titleWrapper = createEl('div', {
+      styles: { display: 'flex', alignItems: 'center', gap: '8px' }
+    });
+
+    const icon = createEl('img', {
+      attributes: {
+        src: chrome.runtime.getURL('icons/chatllm.png'),
+        alt: 'Lyra',
+        width: '24',
+        height: '24'
+      },
+      styles: { borderRadius: '4px' }
+    });
+
+    const title = createEl('div', {
+      styles: { display: 'flex', flexDirection: 'column' }
+    });
+    const titleText = createEl('div', {
+      innerHTML: '提示词生成器',
+      styles: { fontSize: '16px', fontWeight: '600', color: dark ? THEME_COLORS.inputDarkText : THEME_COLORS.inputLightText }
+    });
+    title.append(titleText);
+
+    titleWrapper.append(icon, title);
+
+    const resetBtn = createEl('button', {
+      className: 'opm-chat-reset',
+      innerHTML: '重置',
+      styles: {
+        background: 'transparent',
+        border: 'none',
+        color: dark ? THEME_COLORS.inputDarkText : THEME_COLORS.inputLightText,
+        cursor: 'pointer',
+        fontSize: '14px',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px'
+      }
+    });
+
+    const settingsBtn = createEl('button', {
+      className: 'opm-chat-settings',
+      innerHTML: `<img src="${chrome.runtime.getURL('icons/settings.svg')}" width="16" height="16" alt="设置" style="filter: ${getIconFilter()}">`,
+      styles: {
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '4px',
+        borderRadius: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }
+    });
+
+    const headerRight = createEl('div', {
+      styles: { display: 'flex', alignItems: 'center', gap: '8px' }
+    });
+    headerRight.append(resetBtn, settingsBtn);
+    header.append(titleWrapper, headerRight);
+
+    // Chat messages container
+    const messagesContainer = createEl('div', {
+      id: SELECTORS.CHAT_CONTENT,
+      className: `opm-chat-messages opm-${getMode()}`,
+      styles: {
+        flex: '1 1 auto',
+        overflowY: 'auto',
+        padding: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        minHeight: '0'
+      }
+    });
+
+    // Input area
+    const inputArea = createEl('div', {
+      className: `opm-chat-input-area opm-${getMode()}`,
+      styles: {
+        padding: '12px 16px',
+        borderTop: `1px solid ${dark ? THEME_COLORS.darkBorder : THEME_COLORS.lightBorder}`,
+        display: 'flex',
+        gap: '8px',
+        alignItems: 'flex-end'
+      }
+    });
+
+    const input = createEl('textarea', {
+      id: 'opm-chat-input',
+      className: `opm-chat-input opm-${getMode()}`,
+      attributes: {
+        placeholder: '输入你的需求…',
+        rows: '1'
+      },
+      styles: {
+        flex: '1',
+        padding: '10px 12px',
+        borderRadius: '12px',
+        border: `1px solid ${dark ? THEME_COLORS.darkBorder : THEME_COLORS.lightBorder}`,
+        backgroundColor: dark ? THEME_COLORS.inputDarkBg : THEME_COLORS.inputLightBg,
+        color: dark ? THEME_COLORS.inputDarkText : THEME_COLORS.inputLightText,
+        fontSize: '14px',
+        fontFamily: 'inherit',
+        resize: 'none',
+        outline: 'none',
+        maxHeight: '120px',
+        overflowY: 'auto'
+      }
+    });
+    // COMMENT: 输入框滚动条默认隐藏（仅在滚动时短暂显示），与面板其他区域保持一致
+    ScrollVisibilityManager.observe(input);
+
+    const sendBtn = createEl('button', {
+      className: 'opm-chat-send',
+      innerHTML: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+      styles: {
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        border: 'none',
+        backgroundColor: THEME_COLORS.primary,
+        color: '#fff',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: '0',
+        padding: '0'
+      }
+    });
+
+    inputArea.append(input, sendBtn);
+    container.append(header, messagesContainer, inputArea);
+
+    // Initialize chat
+    initializeChat(messagesContainer, input, sendBtn, resetBtn, settingsBtn);
+
+    ScrollVisibilityManager.observe(messagesContainer);
+    return container;
+  };
+
   // COMMENT: Central map defining builder + UI rules for each panel view.
   const VIEW_DEFINITIONS = {
     [PanelView.LIST]: {
       kind: 'list',
       panelHeight: 'variable',
       searchVisible: true,
+      bottomMenuVisible: true,
       alwaysRebuild: true,
       description: 'Prompt list view needs live data + persisted tags every time.',
       async controller(listEl) {
@@ -396,15 +579,17 @@ const PanelRouter = (() => {
       }
     },
     [PanelView.CREATE]: {
-      builder: () => PromptUIManager.createPromptCreationForm(''),
+      builder: (context) => PromptUIManager.createPromptCreationForm(context?.initialContent || ''),
       panelHeight: 'fixed',
       searchVisible: false,
+      bottomMenuVisible: true,
       description: 'Create view uses fixed-height form; search stays hidden.'
     },
     [PanelView.EDIT]: {
       kind: 'list',
       panelHeight: 'variable',
       searchVisible: true,
+      bottomMenuVisible: true,
       alwaysRebuild: true,
       description: 'Edit view reuses the prompt list with edit + reorder controls.',
       async controller(listEl) {
@@ -430,6 +615,7 @@ const PanelRouter = (() => {
       builder: () => PromptUIManager.createSettingsForm(),
       panelHeight: 'fixed',
       searchVisible: false,
+      bottomMenuVisible: true,
       description: 'Settings is a standalone form with no search.'
     },
     [PanelView.HELP]: {
@@ -440,22 +626,21 @@ const PanelRouter = (() => {
       }),
       panelHeight: 'fixed',
       searchVisible: false,
+      bottomMenuVisible: true,
       description: 'Help content is static HTML pulled from info.html.'
     },
-    [PanelView.CHANGELOG]: {
-      builder: () => createInfoView({
-        titleText: '更新日志',
-        contentId: SELECTORS.CHANGELOG_CONTENT,
-        sourcePath: 'changelog.html'
-      }),
-      panelHeight: 'fixed',
+    [PanelView.CHAT]: {
+      builder: () => createChatView(),
+      panelHeight: 'variable',
       searchVisible: false,
-      description: 'Changelog mirrors the help view but sources changelog.html.'
+      bottomMenuVisible: true,
+      description: 'Chat interface for prompt generation with AI assistant.'
     },
     [PanelView.VARIABLE_INPUT]: {
       builder: (context) => PromptUIManager.createVariableInputForm(context),
       panelHeight: 'fixed',
       searchVisible: false,
+      bottomMenuVisible: true,
       description: 'Variable input form that collects placeholder values before insertion.',
       requiresContext: true,
       alwaysRebuild: true
@@ -466,6 +651,7 @@ const PanelRouter = (() => {
     const heightMode = definition.panelHeight === 'variable' ? 'variable' : 'fixed';
     PromptUIManager.setPanelHeightMode(heightMode);
     PromptUIManager.setSearchVisibility(definition.searchVisible !== false);
+    PromptUIManager.setBottomMenuVisibility(definition.bottomMenuVisible !== false);
     Theme.applyAll();
   };
 
@@ -519,6 +705,550 @@ const PanelRouter = (() => {
   return { mount };
 })();
 window.PanelRouter = PanelRouter;
+
+/**
+ * COMMENT: Initialize chat interface with message handling and API calls
+ */
+const initializeChat = (messagesContainer, input, sendBtn, resetBtn, settingsBtn) => {
+  let messages = [];
+  let systemPrompt = '';
+  const HISTORY_KEY = 'pm_chat_history_v1';
+
+  // Load system prompt from system.md
+  fetch(chrome.runtime.getURL('system.md'))
+    .then(r => r.text())
+    .then(text => {
+      systemPrompt = text;
+    })
+    .catch(err => {
+      console.error('[PromptManager] Failed to load system.md:', err);
+      // Fallback: use default system prompt
+      systemPrompt = 'You are Lyra, a master-level AI prompt optimization specialist.';
+    });
+
+  // Load chat settings
+  const loadSettings = () => {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['chatApiKey', 'chatBaseUrl', 'chatModelName'], (result) => {
+        resolve({
+          apiKey: result.chatApiKey || '',
+          baseUrl: result.chatBaseUrl || 'https://api.openai.com/v1',
+          modelName: result.chatModelName || 'gpt-3.5-turbo'
+        });
+      });
+    });
+  };
+
+  // COMMENT: 持久化对话上下文（在用户点击“重置”之前保留）
+  const loadHistory = () => new Promise(resolve => {
+    chrome.storage.local.get([HISTORY_KEY], (result) => {
+      const raw = result?.[HISTORY_KEY];
+      if (!Array.isArray(raw)) return resolve([]);
+      const clean = raw
+        .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+        .map(m => ({ role: m.role, content: m.content }));
+      resolve(clean);
+    });
+  });
+  const persistHistory = debounce(() => {
+    // COMMENT: 只存 user/assistant 历史；system prompt 不落盘
+    chrome.storage.local.set({ [HISTORY_KEY]: messages.slice() });
+  }, 250);
+
+  // Add message to chat
+  const addMessage = (container, role, content, isStreaming = false) => {
+    const dark = isDarkMode();
+    const messageDiv = createEl('div', {
+      className: `opm-chat-message opm-chat-${role} opm-${getMode()}`
+    });
+
+    if (role === 'assistant' && !isStreaming) {
+      const saveBtn = createEl('div', {
+        className: 'opm-chat-save-prompt',
+        innerHTML: `<img src="${chrome.runtime.getURL('icons/new.svg')}" width="14" height="14" alt="保存" style="filter: ${getIconFilter()}">`,
+        attributes: { title: '保存为提示词' }
+      });
+      saveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        PanelRouter.mount(PanelView.CREATE, { initialContent: content });
+      });
+      messageDiv.appendChild(saveBtn);
+    }
+
+    const contentDiv = createEl('div', {
+      className: 'opm-chat-content',
+      innerHTML: content.replace(/\n/g, '<br>')
+    });
+
+    let cursor = null;
+    if (isStreaming) {
+      cursor = createEl('span', {
+        className: 'opm-chat-stream-cursor',
+        innerHTML: '▊',
+        styles: {
+          animation: 'blink 1s infinite',
+          color: role === 'user' ? '#fff' : THEME_COLORS.primary
+        }
+      });
+      contentDiv.appendChild(cursor);
+    }
+
+    messageDiv.appendChild(contentDiv);
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+    return { messageDiv, contentDiv, cursor };
+  };
+
+  // Get welcome message
+  const getWelcomeMessage = () => {
+    return `输入格式：
+- 目标平台:ChatGPT、Claude、Gemini或其他
+- 提示风格:详细(交互优化)或基本(快速优化)
+
+例子:"使用 ChatGPT 详细模式-给我写一封营销邮件"
+`;
+  };
+
+  // COMMENT: 初始化时恢复历史（若无历史则显示欢迎语）
+  (async () => {
+    try {
+      const history = await loadHistory();
+      if (history.length > 0) {
+        messages = history;
+        messagesContainer.innerHTML = '';
+        history.forEach(m => addMessage(messagesContainer, m.role, m.content, false));
+      } else {
+        addMessage(messagesContainer, 'assistant', getWelcomeMessage(), false);
+      }
+    } catch (_) {
+      addMessage(messagesContainer, 'assistant', getWelcomeMessage(), false);
+    }
+  })();
+
+  // Send message to API
+  const sendMessage = async (userMessage) => {
+    const settings = await loadSettings();
+    if (!settings.apiKey) {
+      addMessage(messagesContainer, 'assistant', '请先在设置中配置API Key。', false);
+      return;
+    }
+
+    messages.push({ role: 'user', content: userMessage });
+    persistHistory();
+    const { messageDiv, contentDiv } = addMessage(messagesContainer, 'assistant', '', true);
+
+    const requestMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages
+    ];
+
+    try {
+      const response = await fetch(`${settings.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${settings.apiKey}`
+        },
+        body: JSON.stringify({
+          model: settings.modelName,
+          messages: requestMessages,
+          stream: true
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: { message: '请求失败' } }));
+        throw new Error(error.error?.message || `HTTP ${response.status}`);
+      }
+
+      // COMMENT: OpenAI 兼容 SSE 流式输出解析
+      const reader = response.body?.getReader?.();
+      if (!reader) {
+        // Fallback: 部分环境/服务不支持流，退回普通 JSON
+        const data = await response.json();
+        const assistantMessage = data.choices?.[0]?.message?.content || '无响应';
+        messages.push({ role: 'assistant', content: assistantMessage });
+        contentDiv.innerHTML = assistantMessage.replace(/\n/g, '<br>');
+        persistHistory();
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return;
+      }
+
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      let acc = '';
+
+      const updateStreamingUI = () => {
+        const cursorEl = contentDiv.querySelector('.opm-chat-stream-cursor');
+        if (cursorEl) cursorEl.remove();
+        contentDiv.innerHTML = acc.replace(/\n/g, '<br>');
+        const nextCursor = createEl('span', {
+          className: 'opm-chat-stream-cursor',
+          innerHTML: '▊',
+          styles: { animation: 'blink 1s infinite', color: THEME_COLORS.primary }
+        });
+        contentDiv.appendChild(nextCursor);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      };
+
+      let done = false;
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        if (doneReading) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // COMMENT: SSE 事件以换行分隔
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+          const dataStr = trimmed.slice(5).trim();
+          if (!dataStr) continue;
+          if (dataStr === '[DONE]') { done = true; break; }
+          let payload;
+          try { payload = JSON.parse(dataStr); } catch (_) { continue; }
+          const delta = payload?.choices?.[0]?.delta?.content ?? payload?.choices?.[0]?.message?.content ?? '';
+          if (typeof delta === 'string' && delta) {
+            acc += delta;
+            updateStreamingUI();
+          }
+        }
+      }
+
+      // COMMENT: 结束时移除光标并落盘对话
+      const cursorEl = contentDiv.querySelector('.opm-chat-stream-cursor');
+      if (cursorEl) cursorEl.remove();
+      contentDiv.innerHTML = acc.replace(/\n/g, '<br>');
+
+      const assistantMessage = acc || '无响应';
+      messages.push({ role: 'assistant', content: assistantMessage });
+      persistHistory();
+
+      // COMMENT: 给每条模型回复增加“保存为提示词”按钮（避免重复插入）
+      if (messageDiv && !messageDiv.querySelector('.opm-chat-save-prompt')) {
+        const saveBtn = createEl('div', {
+          className: 'opm-chat-save-prompt',
+          innerHTML: `<img src="${chrome.runtime.getURL('icons/new.svg')}" width="14" height="14" alt="保存" style="filter: ${getIconFilter()}">`,
+          attributes: { title: '保存为提示词' }
+        });
+        saveBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          PanelRouter.mount(PanelView.CREATE, { initialContent: assistantMessage });
+        });
+        messageDiv.appendChild(saveBtn);
+      }
+    } catch (error) {
+      console.error('[PromptManager] Chat API error:', error);
+      contentDiv.innerHTML = `错误: ${error.message}`;
+    }
+  };
+
+  // Event listeners
+  sendBtn.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMessage(messagesContainer, 'user', text, false);
+    sendMessage(text);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+
+  resetBtn.addEventListener('click', () => {
+    messages = [];
+    messagesContainer.innerHTML = '';
+    addMessage(messagesContainer, 'assistant', getWelcomeMessage(), false);
+    chrome.storage.local.remove([HISTORY_KEY]);
+  });
+
+  // Settings modal
+  let settingsModal = null;
+  settingsBtn.addEventListener('click', () => {
+    if (settingsModal && document.body.contains(settingsModal)) {
+      settingsModal.remove();
+      settingsModal = null;
+      return;
+    }
+
+    const dark = isDarkMode();
+    
+    // Overlay with blur
+    settingsModal = createEl('div', {
+      className: 'opm-chat-settings-modal',
+      styles: {
+        position: 'fixed',
+        top: '0', left: '0', right: '0', bottom: '0',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: '10001',
+        opacity: '0',
+        transition: 'opacity 0.2s ease'
+      }
+    });
+
+    // Main Card
+    const modalContent = createEl('div', {
+      className: `opm-chat-settings-content opm-${getMode()}`,
+      styles: {
+        width: '90%', maxWidth: '440px',
+        maxHeight: '85vh', overflowY: 'auto',
+        backgroundColor: dark ? '#1e293b' : '#ffffff',
+        borderRadius: '16px',
+        border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}`,
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+        transform: 'scale(0.95)', 
+        transition: 'transform 0.2s ease',
+        display: 'flex', flexDirection: 'column'
+      }
+    });
+
+    // Header
+    const header = createEl('div', {
+      styles: {
+        padding: '20px 24px',
+        borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}`
+      }
+    });
+    const title = createEl('h3', { 
+      innerHTML: '模型配置',
+      styles: { margin: '0 0 6px 0', fontSize: '18px', fontWeight: '600', color: dark ? '#f8fafc' : '#0f172a' }
+    });
+    const desc = createEl('p', { 
+      innerHTML: '配置兼容 OpenAI 接口的模型服务（如 DeepSeek, Moonshot 等）。',
+      styles: { margin: '0', fontSize: '13px', color: dark ? '#94a3b8' : '#64748b', lineHeight: '1.4' }
+    });
+    header.append(title, desc);
+
+    // Body
+    const body = createEl('div', { styles: { padding: '24px' } });
+
+    const createField = (label, id, type, placeholder, helpText, defaultValue) => {
+      const wrapper = createEl('div', { styles: { marginBottom: '16px' } });
+      const labelEl = createEl('label', { 
+        innerHTML: label,
+        styles: { display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: dark ? '#cbd5e1' : '#334155' }
+      });
+      const input = createEl('input', {
+        id, type, placeholder,
+        styles: {
+          width: '100%', padding: '10px 12px',
+          borderRadius: '8px',
+          border: `1px solid ${dark ? '#334155' : '#cbd5e1'}`,
+          backgroundColor: dark ? '#0f172a' : '#ffffff',
+          color: dark ? '#e2e8f0' : '#1e293b',
+          fontSize: '14px',
+          outline: 'none',
+          boxSizing: 'border-box',
+          transition: 'border-color 0.15s ease, box-shadow 0.15s ease'
+        }
+      });
+      if (defaultValue) input.value = defaultValue;
+
+      input.addEventListener('focus', () => {
+        input.style.borderColor = THEME_COLORS.primary;
+        input.style.boxShadow = `0 0 0 2px ${THEME_COLORS.primary}30`;
+      });
+      input.addEventListener('blur', () => {
+        input.style.borderColor = dark ? '#334155' : '#cbd5e1';
+        input.style.boxShadow = 'none';
+      });
+
+      wrapper.append(labelEl, input);
+      if (helpText) {
+          const help = createEl('div', {
+              innerHTML: helpText,
+              styles: { marginTop: '4px', fontSize: '12px', color: dark ? '#64748b' : '#94a3b8' }
+          });
+          wrapper.append(help);
+      }
+      return { wrapper, input };
+    };
+
+    const apiKey = createField('API Key', 'chat-api-key', 'password', 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', '服务商提供的 API 密钥');
+    const baseUrl = createField('Base URL', 'chat-base-url', 'text', 'https://api.openai.com/v1', 'API 请求地址 (需包含 /v1)');
+    const modelName = createField('Model Name', 'chat-model-name', 'text', 'gpt-3.5-turbo', '要调用的模型名称 (如 gpt-4, deepseek-chat)');
+
+    const status = createEl('div', {
+      styles: {
+        display: 'none', fontSize: '13px', marginTop: '4px',
+        padding: '10px 14px', borderRadius: '8px',
+        backgroundColor: dark ? 'rgba(54, 116, 181, 0.1)' : '#f0f9ff',
+        color: dark ? '#93c5fd' : '#0369a1',
+        border: dark ? '1px solid rgba(54, 116, 181, 0.2)' : '1px solid #bae6fd',
+        alignItems: 'center', gap: '8px', lineHeight: '1.4'
+      }
+    });
+
+    const setStatus = (text, type = 'info') => {
+      status.style.display = text ? 'flex' : 'none';
+      status.innerHTML = text || '';
+      if (type === 'error') {
+          status.style.backgroundColor = dark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2';
+          status.style.color = dark ? '#fca5a5' : '#991b1b';
+          status.style.borderColor = dark ? 'rgba(239, 68, 68, 0.2)' : '#fecaca';
+      } else if (type === 'success') {
+          status.style.backgroundColor = dark ? 'rgba(34, 197, 94, 0.1)' : '#f0fdf4';
+          status.style.color = dark ? '#86efac' : '#166534';
+          status.style.borderColor = dark ? 'rgba(34, 197, 94, 0.2)' : '#bbf7d0';
+      } else {
+          status.style.backgroundColor = dark ? 'rgba(54, 116, 181, 0.1)' : '#f0f9ff';
+          status.style.color = dark ? '#93c5fd' : '#0369a1';
+          status.style.borderColor = dark ? 'rgba(54, 116, 181, 0.2)' : '1px solid #bae6fd';
+      }
+    };
+
+    body.append(apiKey.wrapper, baseUrl.wrapper, modelName.wrapper, status);
+
+    // Footer
+    const footer = createEl('div', { 
+      styles: { 
+          padding: '16px 24px', 
+          backgroundColor: dark ? 'rgba(0,0,0,0.2)' : '#f8fafc',
+          borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : '#f1f5f9'}`,
+          borderRadius: '0 0 16px 16px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+      } 
+    });
+
+    const leftActions = createEl('div');
+    const testBtn = createEl('button', { 
+      innerHTML: '测试连接',
+      styles: {
+          background: 'transparent', border: 'none', cursor: 'pointer',
+          fontSize: '13px', fontWeight: '500',
+          color: dark ? '#94a3b8' : '#64748b',
+          padding: '8px 12px', borderRadius: '6px',
+          transition: 'color 0.2s, background 0.2s'
+      }
+    });
+    testBtn.addEventListener('mouseenter', () => { testBtn.style.color = THEME_COLORS.primary; testBtn.style.backgroundColor = dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'; });
+    testBtn.addEventListener('mouseleave', () => { testBtn.style.color = dark ? '#94a3b8' : '#64748b'; testBtn.style.backgroundColor = 'transparent'; });
+    leftActions.append(testBtn);
+
+    const rightActions = createEl('div', { styles: { display: 'flex', gap: '12px' } });
+    const cancelBtn = createEl('button', { 
+      innerHTML: '取消',
+      styles: {
+          background: 'transparent', border: `1px solid ${dark ? '#475569' : '#cbd5e1'}`, cursor: 'pointer',
+          fontSize: '13px', fontWeight: '500',
+          color: dark ? '#cbd5e1' : '#475569',
+          padding: '8px 16px', borderRadius: '6px',
+          transition: 'all 0.2s'
+      }
+    });
+    cancelBtn.addEventListener('mouseenter', () => { cancelBtn.style.borderColor = dark ? '#94a3b8' : '#94a3b8'; });
+    cancelBtn.addEventListener('mouseleave', () => { cancelBtn.style.borderColor = dark ? '#475569' : '#cbd5e1'; });
+
+    const saveBtn = createEl('button', { 
+      innerHTML: '保存配置',
+      styles: {
+          background: THEME_COLORS.primary, border: 'none', cursor: 'pointer',
+          fontSize: '13px', fontWeight: '500',
+          color: '#ffffff',
+          padding: '8px 20px', borderRadius: '6px',
+          boxShadow: '0 2px 4px rgba(54, 116, 181, 0.3)',
+          transition: 'all 0.2s'
+      }
+    });
+    saveBtn.addEventListener('mouseenter', () => { saveBtn.style.filter = 'brightness(1.1)'; });
+    saveBtn.addEventListener('mouseleave', () => { saveBtn.style.filter = 'brightness(1)'; });
+
+    rightActions.append(cancelBtn, saveBtn);
+    footer.append(leftActions, rightActions);
+
+    // Initial Data Load
+    loadSettings().then(settings => {
+      apiKey.input.value = settings.apiKey;
+      baseUrl.input.value = settings.baseUrl;
+      modelName.input.value = settings.modelName;
+    });
+
+    // Event Handlers
+    testBtn.addEventListener('click', async () => {
+      const key = apiKey.input.value.trim();
+      const rawUrl = baseUrl.input.value.trim() || 'https://api.openai.com/v1';
+      const url = rawUrl.replace(/\/+$/, '');
+      
+      if (!key) return setStatus('请先填写 API Key', 'error');
+      
+      setStatus('正在连接服务器...', 'info');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        
+        const r = await fetch(`${url}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+          body: JSON.stringify({ model: modelName.input.value || 'gpt-3.5-turbo', messages: [{ role: 'user', content: 'Hi' }], max_tokens: 1 }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (r.ok) {
+          setStatus('连接成功！配置可用', 'success');
+        } else {
+           const errData = await r.json().catch(() => ({}));
+           if (r.status === 404) {
+             setStatus(`连接失败 (404): 路径未找到，请确认 Base URL 正确 (通常以 /v1 结尾)`, 'error');
+           } else {
+             setStatus(`连接失败 (${r.status}): ${errData.error?.message || '请检查配置'}`, 'error');
+           }
+        }
+      } catch (e) { 
+          if (e.name === 'AbortError') {
+            setStatus('连接超时: 请检查网络或 Base URL', 'error');
+          } else {
+            setStatus(`请求错误: ${e.message}`, 'error'); 
+          }
+      }
+    });
+
+    const closeModal = () => {
+      settingsModal.style.opacity = '0';
+      modalContent.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+          if (settingsModal && settingsModal.parentNode) settingsModal.remove();
+          settingsModal = null;
+      }, 200);
+    };
+
+    saveBtn.addEventListener('click', () => {
+      chrome.storage.local.set({
+        chatApiKey: apiKey.input.value.trim(),
+        chatBaseUrl: baseUrl.input.value.trim() || 'https://api.openai.com/v1',
+        chatModelName: modelName.input.value.trim() || 'gpt-3.5-turbo'
+      }, () => {
+        setStatus('保存成功', 'success');
+        setTimeout(closeModal, 600);
+      });
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+
+    modalContent.append(header, body, footer);
+    settingsModal.appendChild(modalContent);
+    settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeModal(); });
+    document.body.appendChild(settingsModal);
+    
+    // Animate In
+    requestAnimationFrame(() => {
+        settingsModal.style.opacity = '1';
+        modalContent.style.transform = 'scale(1)';
+    });
+  });
+};
 
 /* ---------------------------------------------------------------------------
  * [05] Centralized outside-click closer
@@ -716,8 +1446,8 @@ class PromptStorageManager {
 
   // COMMENT: Preference to append prompts instead of overwriting the input area
   static async getDisableOverwrite() {
-    // COMMENT: Default is false (overwrite existing content as before)
-    return await PromptStorageManager.getData('disableOverwrite', false);
+    // COMMENT: 默认开启“追加模式”（不覆盖输入框原有内容）
+    return await PromptStorageManager.getData('disableOverwrite', true);
   }
   static async saveDisableOverwrite(value) {
     // COMMENT: Persist the user's preference for append vs overwrite
@@ -726,7 +1456,8 @@ class PromptStorageManager {
 
   // COMMENT: Feature flag for tags in prompt creation UI (off by default)
   static async getEnableTags() {
-    return await PromptStorageManager.getData('enableTags', false);
+    // COMMENT: 默认开启“标签模式”
+    return await PromptStorageManager.getData('enableTags', true);
   }
   static async saveEnableTags(value) {
     return await PromptStorageManager.setData('enableTags', !!value);
@@ -1015,6 +1746,16 @@ class PromptUIManager {
     if (input) input.style.display = visible ? 'block' : 'none';
   }
 
+  // COMMENT: Control bottom menu visibility. Chat view hides it to prevent overlap with its own input area.
+  static setBottomMenuVisibility(visible) {
+    const panel = document.getElementById(SELECTORS.PANEL_CONTENT);
+    if (!panel) return;
+    const bottomMenu = panel.querySelector('.opm-bottom-menu');
+    if (bottomMenu) bottomMenu.style.display = visible ? 'flex' : 'none';
+    // COMMENT: Panel reserves space for the absolute bottom menu; remove it when hidden.
+    panel.style.paddingBottom = visible ? '64px' : '0px';
+  }
+
   // COMMENT: Centralized prompt items filter used by search input
   static filterPromptItems(term) {
     const value = (term || '').toLowerCase();
@@ -1047,7 +1788,7 @@ class PromptUIManager {
       `.${SELECTORS.PROMPT_ITEMS_CONTAINER}`,
       '.opm-form-container',
       `#${SELECTORS.INFO_CONTENT}`,
-      `#${SELECTORS.CHANGELOG_CONTENT}`,
+      `#${SELECTORS.CHAT_CONTENT}`,
       '.opm-tags-filter-bar'
     ];
     const ensure = (node) => ScrollVisibilityManager.observe(node);

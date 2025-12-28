@@ -60,7 +60,7 @@ var SELECTORS = window.SELECTORS || {
   HOT_CORNER_CONTAINER: 'opm-hot-corner-container',
   HOT_CORNER_INDICATOR: 'opm-hot-corner-indicator',
   INFO_CONTENT: 'opm-info-content',
-  CHANGELOG_CONTENT: 'opm-changelog-content'
+  CHAT_CONTENT: 'opm-chat-content'
 };
 window.SELECTORS = SELECTORS;
 
@@ -113,6 +113,53 @@ var injectGlobalStyles = window.injectGlobalStyles || function injectGlobalStyle
       border-radius: 8px;
     }
     #${SELECTORS.ROOT} .opm-scrollable.opm-scroll-active::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* COMMENT: 用户偏好——滚动条永久隐藏（仅保留滚动功能，不显示任何滑动栏） */
+    /* COMMENT: 这里需要覆盖上面的 “opm-scroll-active” 显示滚动条逻辑，因此使用 !important */
+    #${SELECTORS.ROOT} .opm-scrollable {
+      scrollbar-width: none !important; /* Firefox */
+      -ms-overflow-style: none !important; /* IE/旧 Edge */
+      scrollbar-color: transparent transparent !important;
+    }
+    #${SELECTORS.ROOT} .opm-scrollable::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+    #${SELECTORS.ROOT} .opm-scrollable.opm-scroll-active {
+      scrollbar-width: none !important;
+      scrollbar-color: transparent transparent !important;
+    }
+    #${SELECTORS.ROOT} .opm-scrollable.opm-scroll-active::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+    }
+    #${SELECTORS.ROOT} .opm-scrollable.opm-scroll-active::-webkit-scrollbar-thumb {
+      background-color: transparent !important;
+    }
+    
+    /* COMMENT: 聊天输入框滚动条永久隐藏（用户输入区域不显示任何滚动条） */
+    #${SELECTORS.ROOT} #opm-chat-input {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/旧 Edge */
+    }
+    #${SELECTORS.ROOT} #opm-chat-input::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      background: transparent;
+    }
+
+    /* COMMENT: 聊天设置弹窗不在 ROOT 内，单独隐藏其滚动条（仍可滚动） */
+    .opm-chat-settings-content {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scrollbar-color: transparent transparent;
+    }
+    .opm-chat-settings-content::-webkit-scrollbar {
+      width: 0;
+      height: 0;
       background: transparent;
     }
     /* COMMENT: Horizontal tags bar uses a shorter scrollbar when active */
@@ -178,6 +225,33 @@ var injectGlobalStyles = window.injectGlobalStyles || function injectGlobalStyle
     
     #${SELECTORS.ROOT} .opm-toggle-switch.active::after {
       transform: translateX(20px);
+    }
+    
+    /* COMMENT: 设置页“?” 悬浮提示（tooltip 使用 title 原生提示） */
+    #${SELECTORS.ROOT} .opm-toggle-label-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #${SELECTORS.ROOT} .opm-help-tip {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: help;
+      user-select: none;
+      color: ${THEME_COLORS.primary};
+      border: 1px solid ${THEME_COLORS.primary}55;
+      background: rgba(54, 116, 181, 0.08);
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-help-tip {
+      background: rgba(54, 116, 181, 0.18);
+      border-color: ${THEME_COLORS.primary}80;
     }
     
     /* Prompt Button styling */
@@ -637,6 +711,248 @@ var injectGlobalStyles = window.injectGlobalStyles || function injectGlobalStyle
     }
     #${SELECTORS.ROOT} #${SELECTORS.HOT_CORNER_CONTAINER}:hover #${SELECTORS.HOT_CORNER_INDICATOR} {
       opacity: 1;
+    }
+    
+    /* Chat interface styles */
+    #${SELECTORS.ROOT} .opm-chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    #${SELECTORS.ROOT} .opm-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+    }
+    #${SELECTORS.ROOT} .opm-chat-message {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 14px;
+      max-width: 88%;
+      animation: fadeIn 0.2s ease-out;
+      font-size: 13px;
+      position: relative;
+      line-height: 1.5;
+    }
+    #${SELECTORS.ROOT} .opm-chat-message.opm-chat-user {
+      align-self: flex-end;
+      background-color: var(--primary);
+      color: #fff;
+      border-radius: 18px 18px 2px 18px;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-message.opm-chat-user {
+      background-color: var(--primary);
+    }
+    #${SELECTORS.ROOT} .opm-chat-message.opm-chat-assistant {
+      align-self: flex-start;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      border-radius: 18px 18px 18px 2px;
+      border: 1px solid #e2e8f0;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-message.opm-chat-assistant {
+      background-color: #1e293b;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+    
+    /* Save prompt icon on assistant messages */
+    #${SELECTORS.ROOT} .opm-chat-save-prompt {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 24px;
+      height: 24px;
+      background-color: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      z-index: 10;
+      transition: transform 0.1s ease;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-save-prompt {
+      background-color: #1e293b;
+      border-color: #334155;
+    }
+    #${SELECTORS.ROOT} .opm-chat-message.opm-chat-assistant:hover .opm-chat-save-prompt {
+      display: flex;
+    }
+    #${SELECTORS.ROOT} .opm-chat-save-prompt:hover {
+      transform: scale(1.1);
+      background-color: #f8fafc;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-save-prompt:hover {
+      background-color: #334155;
+    }
+
+    #${SELECTORS.ROOT} .opm-chat-input-area {
+      padding: 10px 12px;
+      border-top: 1px solid var(--light-border);
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      background-color: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-input-area {
+      border-top-color: var(--dark-border);
+      background-color: rgba(10, 38, 71, 0.5);
+    }
+    #${SELECTORS.ROOT} .opm-chat-input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--light-border);
+      background-color: var(--input-light-bg);
+      color: var(--input-light-text);
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      max-height: 80px;
+      overflow-y: auto;
+      transition: border-color 0.2s ease;
+    }
+    #${SELECTORS.ROOT} .opm-chat-input:focus {
+      border-color: var(--primary);
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-input {
+      border-color: var(--dark-border);
+      background-color: var(--input-dark-bg);
+      color: var(--input-dark-text);
+    }
+    
+    /* Shadcn-style Modal */
+    #${SELECTORS.ROOT} .opm-chat-settings-content {
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background-color: #fff;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-content {
+      border-color: #1e293b;
+      background-color: #020617;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-header {
+      border-bottom-color: #1e293b;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-title {
+      color: #f8fafc;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-desc {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-desc {
+      color: #94a3b8;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-body {
+      padding: 20px;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-footer {
+      border-top-color: #1e293b;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-field {
+      margin-bottom: 16px;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
+      margin-bottom: 6px;
+      display: block;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-label {
+      color: #cbd5e1;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(54, 116, 181, 0.1);
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-input {
+      background-color: #0f172a;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(54, 116, 181, 0.2);
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-btn-primary {
+      background-color: #0f172a;
+      color: #fff;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-btn-primary:hover {
+      background-color: #1e293b;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-btn-primary {
+      background-color: #f8fafc;
+      color: #020617;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-btn-primary:hover {
+      background-color: #e2e8f0;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-btn-outline {
+      background-color: #fff;
+      border-color: #e2e8f0;
+      color: #0f172a;
+    }
+    #${SELECTORS.ROOT} .opm-chat-settings-btn-outline:hover {
+      background-color: #f8fafc;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-btn-outline {
+      background-color: transparent;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-chat-settings-btn-outline:hover {
+      background-color: #1e293b;
     }
   `;
   document.head.appendChild(styleEl);

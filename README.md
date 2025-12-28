@@ -1,65 +1,70 @@
-# Open Prompt Manager
+# 提示词管理器（Open Prompt Manager）
 
-一个轻量级的 Chrome 扩展，用于管理多个 AI 聊天机器人的提示词，支持 23+ 个主流 AI 平台，包括 ChatGPT、Claude、Gemini、豆包、智谱清言、Kimi、DeepSeek 等。
+一个轻量级的 Chrome 扩展，用于在多个 AI 平台上**快速管理与插入提示词**，并提供一个内置的“提示词生成器”（OpenAI 兼容接口）辅助生成可复用提示词。
 
-## 功能特性
+## 功能概览
 
-- 🚀 保存、编辑和组织您喜爱的提示词
-- 使用标签进行高级组织
-- 🔍 快速搜索功能和键盘导航
-- 💾 导入/导出提示词以便分享
-- 🌓 支持浅色和深色模式
-- 🔄 支持 `#variable#` 语法的变量
-- 🎯 支持多个 AI 平台：
-  <!--
-    之前的支持平台列表未格式化为有效的 Markdown 表格。
-    下面是一个正确格式化的 Markdown 表格，以便更好地渲染。
-  -->
-  | ChatGPT    | Claude     | Google Gemini |
-  |------------|------------|---------------|
-  | NotebookLM | DeepSeek   | Microsoft Copilot |
-  | Grok       | Poe        | Qwen          |
-  | Perplexity | Kimi       | Mistral Le Chat |
-  | ChatLLM    | OpenRouter | GitHub Copilot |
-  | 豆包       | 千问       | 智谱清言      |
-  | 元宝       | 问小白     | OpenAI Playground |
-  | LMArena    | Google AI Studio |            |
+- **提示词管理**：创建 / 编辑 / 删除 / 搜索；支持导入导出。
+- **标签模式（默认开启）**：为提示词添加标签并按标签筛选；设置页支持“标签管理”排序。
+- **追加模式（默认开启）**：插入提示词时默认追加到输入框末尾，不覆盖已输入内容。
+- **变量占位符**：支持 `#variable#` 语法；插入前弹窗收集变量值并替换。
+- **两种打开方式**：标准按钮模式（可拖动）/ 热角模式（右下角悬停）。
+- **提示词生成器**：
+  - OpenAI 兼容接口配置（API Key / Base URL / Model Name）。
+  - **流式（stream）输出**，体验更友好。
+  - 模型回复可一键**保存为提示词**。
+  - 对话上下文会本地保存，直到用户点击“重置”。
+- **体验细节**：滚动条永久隐藏（仅保留滚动功能）；取消“闲置自动收回”机制，避免对话中途被收起。
 
+## 支持平台（示例）
 
-## 安装
+平台列表来自 `src/llm_providers.json`，可按需扩展。常见示例：
 
-1. 从 [Chrome 网上应用店](https://chromewebstore.google.com/detail/open-prompt-manager/gmhaghdbihgenofhnmdbglbkbplolain) 安装
-2. 使用权限授予您想要使用的大语言模型的访问权限。
+| ChatGPT | Claude | Gemini |
+|---|---|---|
+| DeepSeek | 豆包 | Kimi |
+| 智谱清言 | Perplexity | Poe |
+| Grok | NotebookLM | OpenAI Playground |
+
+## 安装与使用
+
+### 安装（开发者模式）
+
+1. 打开 `chrome://extensions/`，启用“开发者模式”
+2. 点击“加载已解压的扩展程序”，选择本项目 `src/` 目录
+3. 打开任意支持平台页面，在权限管理器中授予对应站点权限（可选主机权限）
 
 ### 键盘快捷键
 
-- **⌘ + Shift + P** (Mac) 或 **Ctrl + M** (Windows/Linux)：打开/关闭提示词列表
-- **↑/↓**：在提示词之间导航
-- **Enter**：选择提示词
-- **Esc**：关闭提示词管理器
+- **macOS**：`⌘ + Shift + P`
+- **Windows / Linux**：`Ctrl + M`
+- 方向键：在列表中上下移动
+- Enter：选择提示词
+- Esc：关闭面板
 
-## 测试
+### 设置项说明
 
-本项目包含使用 **Puppeteer** 和 **Jest** 的自动化测试。有关更高级的测试，请参阅 [Puppeteer API 文档](https://pptr.dev/)。
+在“设置”页中，部分功能文案后带有 `?`，鼠标悬浮可查看解释：
 
-有关如何运行和调试测试的详细说明，请参阅 [测试指南](TESTING.md)。
+- **将提示词追加到文本**：开启后插入为“追加”，关闭则会覆盖输入框内容。
+- **启用标签**：开启后支持标签输入、标签筛选与标签管理。
 
-## 隐私
+## 隐私与数据说明
 
-- 所有提示词都存储在您的浏览器本地
-- 不会向外部服务器发送任何数据
-- 您的提示词保存在本地存储中以获得最大容量
+- **提示词/设置/快捷键/对话历史**均存储在浏览器本地 `chrome.storage.local`。
+- **模型配置（API Key/Base URL/Model Name）仅保存在本机**。
+- “提示词生成器”会把你在对话中输入的内容发送到你配置的 **OpenAI 兼容接口**（例如自建服务/第三方服务）；除此之外扩展不会主动上传你的提示词数据。
+
+## 开发与测试
+
+- **Lint**：`npm run lint`（自动修复：`npm run lint:fix`）
+- **测试**：见 [TESTING.md](TESTING.md)
 
 ## 许可证
 
-本项目是开源的，可在 MIT 许可证下使用。
+MIT
 
 ## 致谢
 
-### 贡献成员：
-
-- 感谢 Hexodus 发现了一个错误并帮助我解决它
-- 感谢 Abdallahheidar 的想法、贡献以及在这个项目上的团队合作！
-- 感谢 HideMaru 提供的精美图标！
-
-<a href="https://www.flaticon.com/free-icons/chatbot" title="chatbot icons">Chatbot icons created by HideMaru - Flaticon</a>
+- 感谢社区贡献与反馈
+- 图标来源：`Flaticon`（HideMaru）

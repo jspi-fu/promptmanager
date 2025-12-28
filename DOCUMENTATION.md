@@ -1,9 +1,9 @@
-## Open Prompt Manager — 架构与开发者指南 (v2.4.0)
+## 提示词管理器（Open Prompt Manager）— 架构与开发者指南 (v2.5.5)
 
-本文档解释了 `src` 目录中 Chrome 扩展的结构、端到端工作原理以及主要逻辑所在位置。涵盖后台/Service Worker 编排、内容脚本和 UI 层、存储/版本管理、权限引导、侧边栏应用以及提供商集成。
+本文档解释了 `src` 目录中 Chrome 扩展的结构、端到端工作原理以及主要逻辑所在位置。涵盖后台/Service Worker 编排、内容脚本和 UI 层、存储/版本管理、权限引导、侧边栏应用以及提供商集成，并补充“提示词生成器”的实现与数据流。
 
 - 目标：Chrome MV3
-- 核心功能：浮动提示词管理器 UI（按钮或热角）、带标签/文件夹的提示词存储、变量替换、键盘快捷键、侧边栏提示词编辑器、右键上下文菜单、按站点权限。
+- 核心功能：浮动提示词管理器 UI（按钮或热角）、带标签/文件夹的提示词存储、变量替换、键盘快捷键、侧边栏提示词编辑器、右键上下文菜单、按站点权限、提示词生成器（OpenAI 兼容接口，支持 stream）。
 
 ### 目录概览
 - `src/manifest.json`: 扩展清单文件 (MV3)。
@@ -21,14 +21,14 @@
 
 ## Manifest 和生命周期
 
-### Manifest 要点
+### Manifest 要点（当前仓库以 `src/manifest.json` 为准）
 扩展使用 MV3、侧边栏和 ES 模块 Service Worker。可选主机权限控制对支持站点的注入。
 
 ```json
 {
     "manifest_version": 3,
-    "name": "Open Prompt Manager",
-    "version": "2.4.0",
+    "name": "提示词管理器",
+    "version": "2.5.5",
     "permissions": ["sidePanel","storage","tabs","scripting","activeTab","contextMenus"],
     "side_panel": { "default_path": "sidepanel/index.html" },
     "background": { "service_worker": "service-worker.js", "type": "module" },
@@ -36,7 +36,7 @@
 }
 ```
 
-- **optional_host_permissions**: 支持的大语言模型（ChatGPT、Claude、Gemini 等）的通配符源。每个源必须由用户明确授予。
+- **optional_host_permissions**: 当前配置为 `<all_urls>`（仍需用户在权限页面显式授予具体站点权限后才会注入）。
 - **web_accessible_resources**: 使特定文件可被内容脚本导入/获取（例如，`promptStorage.js`、`info.html`）。
 
 ### 后台 Service Worker
@@ -119,7 +119,7 @@ var injectGlobalStyles = window.injectGlobalStyles || function injectGlobalStyle
 ### 主 UI、路由、存储、键盘 (`content.js`)
 关键子系统：
 - 工具函数：`createEl`、`debounce`；主题辅助函数 `getMode`、`Theme.applyAll`。
-- 路由：`PanelView` + `PanelRouter.mount(view)` 用于 LIST/CREATE/EDIT/SETTINGS/HELP/CHANGELOG。
+- 路由：`PanelView` + `PanelRouter.mount(view)` 用于 LIST/CREATE/EDIT/SETTINGS/HELP/CHAT/VARIABLE_INPUT。
 - 外部点击处理程序和 `KeyboardManager` 用于打开/关闭和导航。
 - 存储外观：`PromptStorageManager`（通过 `chrome.runtime.getURL` 动态导入 `promptStorage.js`）。
 - 标签：`TagService`（计数/顺序/建议）和 `TagUI`（标签 + 建议输入）。
@@ -155,16 +155,21 @@ UI 注入支持两种模式：
 
 键盘快捷键（默认）：macOS `⌘ + ⇧ + P`，Windows/Linux `Ctrl + M`。按 `Esc` 关闭；方向键导航项目。
 
+### 提示词生成器（CHAT View）
+
+提示词生成器位于内容脚本内的 `PanelView.CHAT`，核心特点：
+
+- **OpenAI 兼容接口**：通过本机配置的 `chatApiKey` / `chatBaseUrl` / `chatModelName` 调用 `POST {baseUrl}/chat/completions`。
+- **stream 流式输出**：请求使用 `stream: true`，并解析 SSE 数据行（`data: {...}` / `data: [DONE]`），边接收边更新气泡内容。
+- **模型回复一键保存为提示词**：每条非流式完成的 assistant 回复会带“保存为提示词”按钮，点击后跳转到 CREATE 表单并预填内容。
+- **对话上下文本地持久化**：对话历史存储在 `chrome.storage.local` 的键 `pm_chat_history_v1` 下，直到用户点击“重置”才清空。用于在面板重建/页面刷新后恢复上下文。
+- **取消闲置自动收回**：通过全局开关 `window.PROMPT_DISABLE_AUTO_CLOSE = true` 禁用面板的自动关闭计时器，避免对话中途被收起。
+
 ## 站点输入检测和插入 (`inputBoxHandler.js`)
 
-`InputBoxHandler` 统一了跨多个站点的检测和写入。它支持 contentEditable 编辑器（包括 Lexical/Perplexity）和普通 `textarea`。它遵循“将提示词追加到文本”设置（`disableOverwrite`）。
+`InputBoxHandler` 统一了跨多个站点的检测和写入。它支持 contentEditable 编辑器（包括 Lexical/Perplexity）和普通 `textarea`。它遵循“将提示词追加到文本”设置（`disableOverwrite`，默认开启追加模式）。
 
-```276:299:/src/inputBoxHandler.js
-// 从存储中读取追加/覆盖偏好，默认为覆盖
-const disableOverwrite = await new Promise(resolve => {
-  chrome.storage.local.get('disableOverwrite', data => resolve(Boolean(data?.disableOverwrite)));
-});
-```
+说明：当前实现会在用户未配置该项时默认返回 `true`，即默认追加而非覆盖。
 
 对于 Lexical 编辑器，它使用 `execCommand('insertText')` 并带有回退，并将光标保持在末尾。对于 `textarea`，它写入 `value` 并重新派发 `input`/`change` 事件以确保应用检测到更改。
 
@@ -247,6 +252,7 @@ const handleProviderClick = function (event) {
 ## 主题和 UI 系统
 
 - `content.styles.js` 在单个根（`#opm-root`）下将所有 CSS 注入到页面，具有浅色/深色变体。
+- 当前默认策略为：**滚动条永久隐藏**（仅保留滚动能力），以保持 UI 视觉更简洁。
 - 内容 UI 和侧边栏共享一致的颜色系统。
 - 图标通过主题感知的 CSS 过滤器着色。
 
@@ -279,7 +285,7 @@ const handleProviderClick = function (event) {
 ## 值得注意的细节和小注意事项
 
 - 后台注入路径检查 URL 模式和权限，但在所有边缘情况下并不严格防止双重注入。代码首先尝试通过 `executeScript(func: ...)` 进行小的“探测”；如果需要，考虑更强的幂等性保护。
-- `settings.js` 引用了 `exportSyncPrompts()`，但该函数在 `importExport.js` 中不存在。主要的导入/导出控件位于内容 UI 设置和侧边栏中。考虑删除或将此页面与统一的导入/导出函数对齐。
+- `settings.js` 仍存在历史遗留逻辑（与当前主 UI/侧边栏的导入导出路径不一致）。建议以 `content.shared.js` 的 Settings 视图与侧边栏为准，逐步清理未使用入口。
 - `llm_providers.json` 包含两个名为“Google AI Studio”的条目；无害，但如果您计划在其他地方渲染唯一名称列表，可以通过名称去重。
 
 ## 按文件快速映射

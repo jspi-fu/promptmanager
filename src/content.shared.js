@@ -33,7 +33,7 @@
     edit: `<img src="${chrome.runtime.getURL('icons/edit.svg')}" width="16" height="16" alt="编辑" title="编辑" style="filter: ${iconFilter()}">`,
     settings: `<img src="${chrome.runtime.getURL('icons/settings.svg')}" width="16" height="16" alt="设置" title="设置" style="filter: ${iconFilter()}">`,
     help: `<img src="${chrome.runtime.getURL('icons/help.svg')}" width="16" height="16" alt="帮助" title="帮助" style="filter: ${iconFilter()}">`,
-    changelog: `<img src="${chrome.runtime.getURL('icons/notes.svg')}" width="16" height="16" alt="更新日志" title="更新日志" style="filter: ${iconFilter()}">`,
+    chat: `<img src="${chrome.runtime.getURL('icons/chatllm.png')}" width="16" height="16" alt="提示词生成" title="提示词生成" style="filter: ${iconFilter()}">`,
   };
 
   const TagService = (() => {
@@ -321,14 +321,14 @@
       },
       createMenuBar() {
         const bar = createEl('div', { styles: { display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', width: '100%' } });
-        const btns = ['list', 'add', 'edit', 'help', 'changelog', 'settings'];
+        const btns = ['list', 'add', 'edit', 'help', 'chat', 'settings'];
         const actions = {
           list: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.LIST); },
           add: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.CREATE); },
           edit: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.EDIT); },
           settings: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.SETTINGS); },
           help: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.HELP); },
-          changelog: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.CHANGELOG); },
+          chat: e => { e.stopPropagation(); PromptUIManager.manuallyOpened = true; PanelRouter.mount(PanelView.CHAT); },
         };
         btns.forEach(type => bar.appendChild(Elements.createIconButton(type, actions[type])));
         return bar;
@@ -348,9 +348,19 @@
         menu.appendChild(Elements.createMenuBar());
         return menu;
       },
-      createToggleRow({ labelText, getValue, onToggle }) {
+      createToggleRow({ labelText, tooltipText, getValue, onToggle }) {
         const row = createEl('div', { styles: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } });
+        const labelWrap = createEl('div', { className: 'opm-toggle-label-wrap' });
         const label = createEl('label', { innerHTML: labelText, styles: { fontSize: '14px' } });
+        labelWrap.appendChild(label);
+        if (tooltipText) {
+          const tip = createEl('span', {
+            className: 'opm-help-tip',
+            attributes: { title: tooltipText, role: 'img', 'aria-label': tooltipText },
+            innerHTML: '?'
+          });
+          labelWrap.appendChild(tip);
+        }
         const toggleSwitch = createEl('div', {
           className: `opm-toggle-switch opm-${getMode()}`
         });
@@ -370,7 +380,7 @@
           .then(applyValue)
           .catch(err => console.warn('[PromptManager] Failed to initialize toggle state:', err));
 
-        row.append(label, toggleSwitch);
+        row.append(labelWrap, toggleSwitch);
         return row;
       }
     };
@@ -650,12 +660,14 @@
 
         settings.appendChild(Elements.createToggleRow({
           labelText: '将提示词追加到文本',
+          tooltipText: '开启后：插入提示词时会追加到输入框末尾，不会覆盖你已输入的内容。',
           getValue: async () => await window.PromptStorageManager.getDisableOverwrite(),
           onToggle: async (active) => { await window.PromptStorageManager.saveDisableOverwrite(active); }
         }));
 
         settings.appendChild(Elements.createToggleRow({
           labelText: '启用标签',
+          tooltipText: '开启后：可为提示词添加标签，并支持按标签筛选；设置页还会显示“标签管理”。',
           getValue: async () => await window.PromptStorageManager.getEnableTags(),
           onToggle: async (active) => { await window.PromptStorageManager.saveEnableTags(active); }
         }));
@@ -1041,6 +1053,11 @@
         hideEl(listEl);
       },
       startCloseTimer(listEl, onClose) {
+        // COMMENT: 允许通过全局开关彻底禁用“闲置自动收回”机制（用户更偏好手动控制面板显示）
+        if (window.PROMPT_DISABLE_AUTO_CLOSE === true) {
+          Behaviors.cancelCloseTimer();
+          return;
+        }
         if (State.closeTimer) clearTimeout(State.closeTimer);
         State.closeTimer = setTimeout(() => {
           try { if (typeof onClose === 'function') onClose(); } finally {

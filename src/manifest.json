@@ -39,11 +39,11 @@
         {
             "resources": [
                 "icons/*",
-                "changelog.html",
                 "info.html",
                 "promptStorage.js",
                 "utils.js",
-                "llm_providers.json"
+                "llm_providers.json",
+                "system.md"
             ],
             "matches": [
                 "<all_urls>"

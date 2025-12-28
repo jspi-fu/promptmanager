@@ -99,20 +99,6 @@
       "element_selector": "div.ProseMirror[contenteditable='true']"
     },
     {
-      "name": "Microsoft Copilot",
-      "pattern": "*://copilot.microsoft.com/*",
-      "url": "https://copilot.microsoft.com",
-      "icon_url": "../icons/copilot.png",
-      "element_selector": "#userInput"
-    },
-    {
-      "name": "GitHub Copilot",
-      "pattern": "*://github.com/copilot/*",
-      "url": "*://github.com/copilot/*",
-      "icon_url": "https://github.githubassets.com/favicons/favicon.svg",
-      "element_selector": "#copilot-chat-textarea, textarea#copilot-chat-textarea, textarea[aria-label=\"Ask anything\"], textarea[placeholder=\"Ask anything\"], [placeholder=\"Ask Copilot\"]"
-    },
-    {
       "name": "Mistral Le Chat",
       "pattern": "*://chat.mistral.ai/*",
       "url": "https://chat.mistral.ai",
@@ -125,13 +111,6 @@
       "url": "https://platform.openai.com/chat",
       "icon_url": "../icons/openai-pg-icon.png",
       "element_selector": "#root textarea"
-    },
-    {
-      "name": "OpenRouter",
-      "pattern": "*://openrouter.ai/*",
-      "url": "https://openrouter.ai",
-      "icon_url": "https://openrouter.ai/favicon.ico",
-      "element_selector": "input[type=\"text\"][placeholder=\"Start a message...\"]"
     },
     {
       "name": "ChatLLM",
