@@ -27,13 +27,13 @@
     const iconFilter = () => (typeof getIconFilterFn === 'function' ? getIconFilterFn() : fallbackIconFilter);
 
     const ICON_SVGS = {
-    list: `<img src="${chrome.runtime.getURL('icons/list.svg')}" width="16" height="16" alt="List Prompts" title="List Prompts" style="filter: ${iconFilter()}">`,
-    add: `<img src="${chrome.runtime.getURL('icons/new.svg')}" width="16" height="16" alt="Add Prompt" title="Add Prompt" style="filter: ${iconFilter()}">`,
-    delete: `<img src="${chrome.runtime.getURL('icons/delete.svg')}" width="16" height="16" alt="Delete" title="Delete" style="filter: ${iconFilter()}">`,
-    edit: `<img src="${chrome.runtime.getURL('icons/edit.svg')}" width="16" height="16" alt="Edit" title="Edit" style="filter: ${iconFilter()}">`,
-    settings: `<img src="${chrome.runtime.getURL('icons/settings.svg')}" width="16" height="16" alt="Settings" title="Settings" style="filter: ${iconFilter()}">`,
-    help: `<img src="${chrome.runtime.getURL('icons/help.svg')}" width="16" height="16" alt="Help" title="Help" style="filter: ${iconFilter()}">`,
-    changelog: `<img src="${chrome.runtime.getURL('icons/notes.svg')}" width="16" height="16" alt="Changelog" title="Changelog" style="filter: ${iconFilter()}">`,
+    list: `<img src="${chrome.runtime.getURL('icons/list.svg')}" width="16" height="16" alt="提示词列表" title="提示词列表" style="filter: ${iconFilter()}">`,
+    add: `<img src="${chrome.runtime.getURL('icons/new.svg')}" width="16" height="16" alt="添加提示词" title="添加提示词" style="filter: ${iconFilter()}">`,
+    delete: `<img src="${chrome.runtime.getURL('icons/delete.svg')}" width="16" height="16" alt="删除" title="删除" style="filter: ${iconFilter()}">`,
+    edit: `<img src="${chrome.runtime.getURL('icons/edit.svg')}" width="16" height="16" alt="编辑" title="编辑" style="filter: ${iconFilter()}">`,
+    settings: `<img src="${chrome.runtime.getURL('icons/settings.svg')}" width="16" height="16" alt="设置" title="设置" style="filter: ${iconFilter()}">`,
+    help: `<img src="${chrome.runtime.getURL('icons/help.svg')}" width="16" height="16" alt="帮助" title="帮助" style="filter: ${iconFilter()}">`,
+    changelog: `<img src="${chrome.runtime.getURL('icons/notes.svg')}" width="16" height="16" alt="更新日志" title="更新日志" style="filter: ${iconFilter()}">`,
   };
 
   const TagService = (() => {
@@ -78,7 +78,7 @@
       const tagsSet = new Set(Array.isArray(initialTags) ? initialTags : []);
       const row = createEl('div', { className: `opm-tag-row opm-${getMode()}` });
       const pills = createEl('div', { className: 'opm-tags-container' });
-      const input = createEl('input', { attributes: { type: 'text', placeholder: 'Tags' }, className: `opm-tag-input opm-${getMode()}` });
+      const input = createEl('input', { attributes: { type: 'text', placeholder: '标签' }, className: `opm-tag-input opm-${getMode()}` });
       const suggestions = createEl('div', { className: `opm-tag-suggestions opm-${getMode()}`, styles: { display: 'none' } });
       let activeIndex = -1; let options = [];
 
@@ -203,7 +203,7 @@
           });
         };
 
-        const allPill = makePill('All', (selectedTag || 'all') === 'all');
+        const allPill = makePill('全部', (selectedTag || 'all') === 'all');
         allPill.dataset.tag = 'all';
         allPill.addEventListener('click', e => { e.stopPropagation(); if (typeof onSelect === 'function') onSelect('all'); updateSelected('all'); });
         bar.appendChild(allPill);
@@ -309,7 +309,7 @@
         const editIcon = Elements.createIconButton('edit', (e) => { e.stopPropagation(); window.PromptUIManager.showEditForm(prompt); });
         const deleteIcon = Elements.createIconButton('delete', (e) => {
           e.stopPropagation();
-          if (confirm(`Delete \"${prompt.title}\"?`)) window.PromptUIManager.deletePrompt(prompt.uuid);
+          if (confirm(`确定要删除"${prompt.title}"吗？`)) window.PromptUIManager.deletePrompt(prompt.uuid);
         });
         actions.append(editIcon, deleteIcon);
 
@@ -341,7 +341,7 @@
         const search = createEl('input', {
           id: SELECTORS.PROMPT_SEARCH_INPUT,
           className: `opm-search-input opm-${getMode()}`,
-          attributes: { type: 'text', placeholder: 'Type to search', style: 'border-radius: 4px;' }
+          attributes: { type: 'text', placeholder: '输入搜索', style: 'border-radius: 4px;' }
         });
         search.addEventListener('input', e => { PromptUIManager.filterPromptItems(e.target.value); });
         menu.appendChild(search);
@@ -518,9 +518,9 @@
     const Views = {
       createPromptForm({ initialTitle = '', initialContent = '', submitLabel = 'Save', onSubmit }) {
         const form = createEl('div', { className: `opm-form-container opm-create-form opm-${getMode()}`, styles: { padding: '0', display: 'flex', flexDirection: 'column', gap: '4px' } });
-        const titleIn = createEl('input', { attributes: { placeholder: 'Prompt Title' }, className: `opm-input-field opm-${getMode()}`, styles: { borderRadius: '4px' } });
+        const titleIn = createEl('input', { attributes: { placeholder: '提示词标题' }, className: `opm-input-field opm-${getMode()}`, styles: { borderRadius: '4px' } });
         const contentArea = createEl('textarea', {
-          attributes: { placeholder: 'Write your prompt. Use hashtags for #variables#' },
+          attributes: { placeholder: '编写您的提示词。使用 #变量名# 来添加变量' },
           className: `opm-textarea-field opm-${getMode()}`,
           styles: { flex: '1 1 auto', minHeight: '0', height: 'auto' }
         });
@@ -530,7 +530,7 @@
         saveBtn.addEventListener('click', async e => {
           e.stopPropagation();
           const t = titleIn.value.trim(), c = contentArea.value.trim();
-          if (!t || !c) { alert('Please fill in both title and content.'); return; }
+          if (!t || !c) { alert('请填写标题和内容。'); return; }
           if (typeof onSubmit === 'function') await onSubmit({ title: t, content: c });
         });
         form.append(titleIn, contentArea, saveBtn);
@@ -598,9 +598,9 @@
         const enableTags = await window.PromptStorageManager.getEnableTags();
 
         const form = createEl('div', { className: `opm-form-container opm-${getMode()}`, styles: { padding: '0', display: 'flex', flexDirection: 'column', gap: '8px' } });
-        const titleIn = createEl('input', { attributes: { placeholder: 'Prompt Title' }, className: `opm-input-field opm-${getMode()}`, styles: { borderRadius: '4px' } });
+        const titleIn = createEl('input', { attributes: { placeholder: '提示词标题' }, className: `opm-input-field opm-${getMode()}`, styles: { borderRadius: '4px' } });
         const contentArea = createEl('textarea', {
-          attributes: { placeholder: 'Enter your prompt here. Add variables with #examplevariable#' },
+          attributes: { placeholder: '在此输入您的提示词。使用 #变量名# 来添加变量' },
           className: `opm-textarea-field opm-${getMode()}`,
           styles: { flex: '1 1 auto', minHeight: '0', height: 'auto' }
         });
@@ -616,14 +616,14 @@
           tagsBlock.append(label, tagInput.element);
         }
 
-        const saveBtn = createEl('button', { innerHTML: 'Create Prompt', className: `opm-button opm-${getMode()}` });
+        const saveBtn = createEl('button', { innerHTML: '创建提示词', className: `opm-button opm-${getMode()}` });
         saveBtn.addEventListener('click', async e => {
           e.stopPropagation();
           const t = titleIn.value.trim(), c = contentArea.value.trim();
-          if (!t || !c) { alert('Please fill in both title and content.'); return; }
+          if (!t || !c) { alert('请填写标题和内容。'); return; }
           const tags = enableTags && tagInput ? tagInput.getTags() : [];
           const res = await window.PromptStorageManager.savePrompt({ title: t, content: c, tags });
-          if (!res.success) { alert('Error saving prompt.'); return; }
+          if (!res.success) { alert('保存提示词时出错。'); return; }
           window.PanelRouter.mount(window.PanelView.LIST);
         });
 
@@ -635,11 +635,11 @@
       },
       createSettingsForm() {
         const form = createEl('div', { className: `opm-form-container opm-${getMode()}`, styles: { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' } });
-        const title = createEl('div', { styles: { fontWeight: 'bold', fontSize: '16px', marginBottom: '10px' }, innerHTML: 'Settings' });
+        const title = createEl('div', { styles: { fontWeight: 'bold', fontSize: '16px', marginBottom: '10px' }, innerHTML: '设置' });
         const settings = createEl('div', { styles: { display: 'flex', flexDirection: 'column', gap: '12px' } });
 
         settings.appendChild(Elements.createToggleRow({
-          labelText: 'Hot Corner Mode',
+          labelText: '热角模式',
           getValue: async () => (await window.PromptStorageManager.getDisplayMode()) === 'hotCorner',
           onToggle: async (active) => {
             const newMode = active ? 'hotCorner' : 'standard';
@@ -649,19 +649,19 @@
         }));
 
         settings.appendChild(Elements.createToggleRow({
-          labelText: 'Append prompts to text',
+          labelText: '将提示词追加到文本',
           getValue: async () => await window.PromptStorageManager.getDisableOverwrite(),
           onToggle: async (active) => { await window.PromptStorageManager.saveDisableOverwrite(active); }
         }));
 
         settings.appendChild(Elements.createToggleRow({
-          labelText: 'Enable tags',
+          labelText: '启用标签',
           getValue: async () => await window.PromptStorageManager.getEnableTags(),
           onToggle: async (active) => { await window.PromptStorageManager.saveEnableTags(active); }
         }));
 
         settings.appendChild(Elements.createToggleRow({
-          labelText: 'Force Dark Mode',
+          labelText: '暗色模式',
           getValue: async () => {
             const enabled = await window.PromptStorageManager.getForceDarkMode();
             window.isDarkModeForced = !!enabled;
@@ -674,9 +674,9 @@
           }
         }));
 
-        const dataSectionTitle = createEl('div', { styles: { fontWeight: 'bold', fontSize: '14px', marginTop: '6px' }, innerHTML: 'Prompt Management' });
+        const dataSectionTitle = createEl('div', { styles: { fontWeight: 'bold', fontSize: '14px', marginTop: '6px' }, innerHTML: '提示词管理' });
         const dataActions = createEl('div', { styles: { display: 'flex', gap: '8px' } });
-        const exportBtn = createEl('button', { innerHTML: 'Export', className: `opm-button opm-${getMode()}` });
+        const exportBtn = createEl('button', { innerHTML: '导出', className: `opm-button opm-${getMode()}` });
         exportBtn.addEventListener('click', async e => {
           e.stopPropagation();
           try {
@@ -690,10 +690,10 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
           } catch (err) {
-            alert('Export failed.');
+            alert('导出失败。');
           }
         });
-        const importBtn = createEl('button', { innerHTML: 'Import', className: `opm-button opm-${getMode()}` });
+        const importBtn = createEl('button', { innerHTML: '导入', className: `opm-button opm-${getMode()}` });
         importBtn.addEventListener('click', async e => {
           e.stopPropagation();
           const fileInput = createEl('input', { attributes: { type: 'file', accept: '.json' } });
@@ -706,10 +706,10 @@
                 if (!Array.isArray(imported)) throw new Error('Invalid format');
                 const merged = await window.PromptStorageManager.mergeImportedPrompts(imported);
                 window.PromptUIManager.refreshPromptList(merged);
-                importBtn.textContent = 'Import successful!';
-                setTimeout(() => importBtn.textContent = 'Import', window.IMPORT_SUCCESS_RESET_MS || 2000);
+                importBtn.textContent = '导入成功！';
+                setTimeout(() => importBtn.textContent = '导入', window.IMPORT_SUCCESS_RESET_MS || 2000);
               } catch (err) {
-                alert('Invalid JSON file format.');
+                alert('无效的 JSON 文件格式。');
               }
             }
           });
@@ -717,21 +717,21 @@
         });
         dataActions.append(exportBtn, importBtn);
         const deleteAllBtn = createEl('button', {
-          innerHTML: 'Delete all prompts',
+          innerHTML: '删除所有提示词',
           className: `opm-button opm-${getMode()}`,
           styles: { backgroundColor: '#9CA3AF', marginTop: '4px' }
         });
         deleteAllBtn.addEventListener('click', async e => {
           e.stopPropagation();
-          if (!confirm('Delete ALL prompts? This cannot be undone.')) return;
+          if (!confirm('确定要删除所有提示词吗？此操作无法撤销。')) return;
           try {
             await window.PromptStorageManager.setPrompts([]);
             window.PanelRouter.mount(window.PanelView.SETTINGS);
           } catch (_) {
-            alert('Failed to delete prompts.');
+            alert('删除提示词失败。');
           }
         });
-        const tagMgmtTitle = createEl('div', { styles: { fontWeight: 'bold', fontSize: '14px', marginTop: '12px', display: 'none' }, innerHTML: 'Tag management' });
+        const tagMgmtTitle = createEl('div', { styles: { fontWeight: 'bold', fontSize: '14px', marginTop: '12px', display: 'none' }, innerHTML: '标签管理' });
         const tagMgmtContainer = createEl('div', { styles: { display: 'none', flexDirection: 'column', gap: '6px' } });
         (async () => {
           try {

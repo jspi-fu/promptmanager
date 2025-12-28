@@ -46,7 +46,7 @@
       "name": "Grok",
       "pattern": "*://grok.com/*",
       "url": "https://grok.com",
-      "icon_url": "https://grok.com/images/favicon-light.png",
+      "icon_url": "../icons/grok-icon.png",
       "element_selector": "div.ProseMirror[contenteditable='true']"
     },
     {

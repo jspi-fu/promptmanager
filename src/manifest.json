@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Open Prompt Manager",
+    "name": "提示词管理器",
     "version": "2.5.5",
-    "description": "Open Source Prompt Manager for ChatGPT, Claude, Gemini, Grok and more.",
+    "description": "开源提示词管理器，支持 ChatGPT、Claude、Gemini、Grok 等多个 AI 平台。",
     "permissions": [
         "sidePanel",
         "storage",
@@ -20,7 +20,7 @@
         "128": "/icons/icon128.png"
     },
     "action": {
-        "default_title": "Open Sidebar",
+        "default_title": "打开侧边栏",
         "default_icon": {
             "16": "/icons/icon16.png",
             "48": "/icons/icon48.png",

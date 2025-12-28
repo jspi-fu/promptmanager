@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Simple Prompt Manager</title>
+  <title>提示词管理器</title>
   <link rel="stylesheet" href="styles.css" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,7 +14,7 @@
         <source media="(prefers-color-scheme: dark)" srcset="../icons/icon-main-s.png">
         <img class="header-icon" src="../icons/icon-main-s color.png" alt="Extension Icon" style="width: 22px; height: 22px" />
       </picture>
-    <h2>Open Prompt Manager</h2>
+    <h2>提示词管理器</h2>
     <a href="index.html" target="_blank">
       <img id="open-new-tab" class="header-icon" src="../icons/open_in_new.svg" alt="Open in New Tab"
         title="Open in New Tab" />
@@ -22,53 +22,53 @@
   </div>
   <form id="prompt-form">
     <input type="hidden" id="prompt-index" />
-    <input type="text" id="prompt-title" placeholder="Prompt Title" required />
-    <textarea id="prompt-content" placeholder="Enter your prompt here - Use #variablename# for dynamic values." required style="height: 100%"></textarea>
+    <input type="text" id="prompt-title" placeholder="提示词标题" required />
+    <textarea id="prompt-content" placeholder="在此输入您的提示词 - 使用 #变量名# 来设置动态值。" required style="height: 100%"></textarea>
     <button class="main" type="submit" id="submit-button">
-      <img src="../icons/add-icon.png" alt="Add" style="margin-right: 5px" />
-      Save prompt
+      <img src="../icons/add-icon.png" alt="添加" style="margin-right: 5px" />
+      保存提示词
     </button>
     <button type="button" id="cancel-edit-button" style="display: none">
-      Cancel
+      取消
     </button>
   </form>
   <div id="info-banner" class="info-banner" role="status" aria-live="polite">
     <button id="info-banner-close" class="info-banner-close" aria-label="Dismiss info banner">&times;</button>
-    <h3 class="info-banner-title">New updates, new features!</h3>
+    <h3 class="info-banner-title">新版本，新功能！</h3>
     <br />
-    <p class="info-banner-text">Hey there,</p> 
+    <p class="info-banner-text">您好，</p> 
     <br />
-    <p class="info-banner-text">I won't do this often, but I'm happy to share that V2 finally got delivered! It brings new features and improvements, and is a foundation for some pretty cool stuff.</p>
+    <p class="info-banner-text">虽然不常这样做，但我很高兴与您分享 V2 版本终于发布了！它带来了新功能和改进，并为一些很酷的功能奠定了基础。</p>
     <ul class="info-banner-list">
-      <li>Now supporting 19 LLMs!</li>
-      <li>Permissions manager for new LLMs.</li>
-      <li>Responsive sidepanel for composing prompts.</li>
-      <li>Copy & paste from the side panel & right click menu.</li>
-      <li>New setting : Append the prompt to input.</li> 
-      <li>Now looks better than ever, both in light & dark mode.</li>      
+      <li>现在支持 19 个大语言模型！</li>
+      <li>新 LLM 的权限管理器。</li>
+      <li>响应式侧边栏用于编写提示词。</li>
+      <li>从侧边栏和右键菜单复制和粘贴。</li>
+      <li>新设置：将提示词追加到输入框。</li> 
+      <li>现在看起来比以往任何时候都更好，支持明暗模式。</li>      
     </ul>
     <br />
-    <p class="info-banner-text">Permissions management is handled using the <strong><a href="../permissions/permissions.html" target="_blank">lock icon</a></strong> on the bottom right of the side panel.</p>
+    <p class="info-banner-text">权限管理可通过侧边栏右下角的<strong><a href="../permissions/permissions.html" target="_blank">锁定图标</a></strong>进行管理。</p>
     <br />
-    <p class="info-banner-text">For the many users that have shown support, shared feedback, and used the extension, I'd like to take the occasion to say <strong>thank you</strong>.</p>
+    <p class="info-banner-text">对于许多给予支持、分享反馈和使用此扩展的用户，我想借此机会说声<strong>谢谢</strong>。</p>
     <br />
-    <p class="info-banner-text">Don't hesitate to review <a href="https://chromewebstore.google.com/detail/open-prompt-manager/gmhaghdbihgenofhnmdbglbkbplolain" target="_blank">Open Prompt Manager</a> on the Chrome Web Store.</p>
+    <p class="info-banner-text">欢迎在 Chrome 网上应用店为<a href="https://chromewebstore.google.com/detail/open-prompt-manager/gmhaghdbihgenofhnmdbglbkbplolain" target="_blank">提示词管理器</a>留下评价。</p>
     <br />
-    <p class="info-banner-text">Thanks again!</p>
+    <p class="info-banner-text">再次感谢！</p>
   </div>
   <div class="prompts-container">
     <div class="prompts-section">
       <!-- COMMENT: Empty state when no LLM provider permissions are enabled -->
       <div id="permissions-shortcut" class="shortcut-container" style="display: none">
-        <p style="margin: 8px 0">Add your supported Assistants below to get started.</p>
+        <p style="margin: 8px 0">在下方添加您支持的 AI 助手以开始使用。</p>
       </div>
       <ul id="prompt-list">
 
       </ul>
       <!-- Add title and message about storage changes -->
       <div id="empty-state" class="shortcut-container" style="display: none">
-        <h3>Keyboard Navigation &amp; Shortcuts</h3>
-        <p>These can be used on any page supported by the extension.</p>
+        <h3>键盘导航与快捷键</h3>
+        <p>这些快捷键可在扩展支持的任何页面上使用。</p>
         <p style="display: flex; align-items: center; margin: 8px 0"> <span style="
                 background-color: var(--primary);
                 color: white;
@@ -76,7 +76,7 @@
                 border-radius: 4px;
                 margin-right: 10px;
               ">
-            Hover/Click </span> <span>Open prompt list buttons</span> </p>
+            悬停/点击 </span> <span>打开提示词列表按钮</span> </p>
         <p style="display: flex; align-items: center; margin: 8px 0"> <span style="
                 background-color: var(--primary);
                 color: white;
@@ -84,34 +84,34 @@
                 border-radius: 4px;
                 margin-right: 10px;
               ">
-            ⌘ + ⇧ + P or Ctrl + M </span> <span>Open / close prompt list</span> </p>
+            ⌘ + ⇧ + P 或 Ctrl + M </span> <span>打开/关闭提示词列表</span> </p>
         <p style="display: flex; align-items: center; margin: 8px 0"> <span style="
                 background-color: var(--primary);
                 color: white;
                 padding: 4px 8px;
                 border-radius: 4px;
                 margin-right: 10px;
-              ">↑↓</span> <span>Navigate the prompt list</span> </p>
+              ">↑↓</span> <span>导航提示词列表</span> </p>
         <p style="display: flex; align-items: center; margin: 8px 0"> <span style="
                 background-color: var(--primary);
                 color: white;
                 padding: 4px 8px;
                 border-radius: 4px;
                 margin-right: 10px;
-              ">Enter</span> <span>Select a prompt</span> </p>
+              ">Enter</span> <span>选择提示词</span> </p>
         <p style="display: flex; align-items: center; margin: 8px 0"> <span style="
                 background-color: var(--primary);
                 color: white;
                 padding: 4px 8px;
                 border-radius: 4px;
                 margin-right: 10px;
-              ">Esc</span> <span>Close the prompt manager</span> </p>
+              ">Esc</span> <span>关闭提示词管理器</span> </p>
       </div>
     </div>
   </div>
   <!-- COMMENT: LLMs section shows activated and available providers, mirroring the permissions page behavior -->
   <div id="llms-section" class="llms-section">
-    <h3 class="llms-heading">Assistants</h3>
+    <h3 class="llms-heading">AI 助手</h3>
     <p></p>
     <div class="llms-group">
       <div id="llms-activated" class="llms-pills" aria-live="polite">
@@ -120,7 +120,7 @@
     </div>
     <div class="llms-group">
       <!-- COMMENT: Available section is foldable; collapsed by default -->
-      <div class="llms-subheading" id="llms-available-toggle" role="button" tabindex="0" aria-controls="llms-available" aria-expanded="false">Add more</div>
+      <div class="llms-subheading" id="llms-available-toggle" role="button" tabindex="0" aria-controls="llms-available" aria-expanded="false">添加更多</div>
       <div id="llms-available" class="llms-pills collapsible" aria-live="polite">
         <!-- COMMENT: Available provider pills rendered here (click to request permission) -->
       </div>
@@ -128,16 +128,16 @@
   </div>
   <!-- COMMENT: Prompt Management section with fold/unfold, folded by default -->
   <div id="pm-section" class="llms-section">
-    <h3 class="llms-heading" id="pm-toggle" role="button" tabindex="0" aria-controls="pm-controls" aria-expanded="false">Settings</h3>
+    <h3 class="llms-heading" id="pm-toggle" role="button" tabindex="0" aria-controls="pm-controls" aria-expanded="false">设置</h3>
     <div class="llms-group">
       <div id="pm-controls" class="pm-controls collapsible" aria-live="polite">
-        <div class="pm-subtitle">Manage your saved prompts.</div>
+        <div class="pm-subtitle">管理您保存的提示词。</div>
         <div class="pm-row">
-          <button class="main" id="export-btn">Export</button>
-          <button class="main" id="import-btn">Import</button>
+          <button class="main" id="export-btn">导出</button>
+          <button class="main" id="import-btn">导入</button>
         </div>
         <input type="file" id="import-file" accept=".json" hidden />
-        <div class="pm-subtitle">Other settings can be found when using the Assistants.</div>
+        <div class="pm-subtitle">其他设置可在使用 AI 助手时找到。</div>
       </div>
     </div>
   </div>
@@ -180,7 +180,7 @@
           box-shadow: 0 1px 2px rgba(0,0,0,0.04);
           transition: background 0.15s;
         ">
-          Get Started
+          开始使用
         </span>
       </a>
     </div>

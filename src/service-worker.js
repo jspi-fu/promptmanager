@@ -187,7 +187,7 @@ async function createPromptContextMenu() {
     // Create the parent menu
     chrome.contextMenus.create({
       id: 'open-prompt-manager',
-      title: 'Open Prompt Manager',
+      title: '打开提示词管理器',
       contexts: ['all']
     });
     // First child: "Save as prompt" – only shown when there is a text selection
@@ -195,7 +195,7 @@ async function createPromptContextMenu() {
     chrome.contextMenus.create({
       id: 'save-as-prompt',
       parentId: 'open-prompt-manager',
-      title: 'Save new prompt',
+      title: '保存为新提示词',
       contexts: ['selection']
     });
     // COMMENT: Visual separator between "Save as prompt" and the list of existing prompts.
@@ -212,7 +212,7 @@ async function createPromptContextMenu() {
         chrome.contextMenus.create({
           id: 'prompt-' + idx,
           parentId: 'open-prompt-manager',
-          title: prompt.title || `Prompt ${idx + 1}`,
+          title: prompt.title || `提示词 ${idx + 1}`,
           contexts: ['all']
         });
       });
@@ -258,7 +258,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       const [{ result: titleValue }] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          return window.prompt('Enter a title for your prompt', '');
+          return window.prompt('请输入提示词标题', '');
         }
       });
       const title = (titleValue || '').trim();
@@ -266,7 +266,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         // Show the requested error message if no title provided
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
-          func: () => { window.alert('Please add a title to your prompt.'); }
+          func: () => { window.alert('请为提示词添加标题。'); }
         });
         return;
       }
@@ -276,8 +276,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       chrome.notifications?.create({
         type: 'basic',
         iconUrl: 'icons/icon128.png',
-        title: 'Prompt Saved',
-        message: `Saved: ${title}`
+        title: '提示词已保存',
+        message: `已保存：${title}`
       });
     } catch (err) {
       console.error('Failed to save prompt from selection:', err);
@@ -296,8 +296,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         chrome.notifications?.create({
           type: 'basic',
           iconUrl: 'icons/icon128.png',
-          title: 'Prompt Copied',
-          message: `Copied: ${prompts[idx].title}`
+          title: '提示词已复制',
+          message: `已复制：${prompts[idx].title}`
         });
       } catch (err) {
         // Fallback: try to copy using the tabs API if clipboard API fails

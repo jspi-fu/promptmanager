@@ -424,7 +424,7 @@ const PanelRouter = (() => {
     },
     [PanelView.HELP]: {
       builder: () => createInfoView({
-        titleText: 'Navigation & Features',
+        titleText: '导航与功能',
         contentId: SELECTORS.INFO_CONTENT,
         sourcePath: 'info.html'
       }),
@@ -434,7 +434,7 @@ const PanelRouter = (() => {
     },
     [PanelView.CHANGELOG]: {
       builder: () => createInfoView({
-        titleText: 'Changelog',
+        titleText: '更新日志',
         contentId: SELECTORS.CHANGELOG_CONTENT,
         sourcePath: 'changelog.html'
       }),
@@ -857,7 +857,7 @@ class PromptUIManager {
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.15)',
         textAlign: 'center', whiteSpace: 'nowrap', transition: 'opacity 0.3s ease'
       },
-      innerHTML: 'Hover to Start'
+      innerHTML: '悬停开始'
     });
     const triangle = createEl('div', {
       styles: {
@@ -969,7 +969,31 @@ class PromptUIManager {
     }
     PromptUIManager.setSearchVisibility(true);
     // COMMENT: After a storage-driven refresh, reapply the active tag filter (if any) and current search term
-    const selected = (PromptUIManager.activeTagFilter || 'all');
+    // COMMENT: Check if the currently selected tag still exists; if not, reset to 'all' to avoid empty list
+    const currentTag = (PromptUIManager.activeTagFilter || 'all').toLowerCase();
+    let selected = currentTag;
+    if (currentTag !== 'all') {
+      // COMMENT: Compute tag counts synchronously from the prompts array
+      const counts = new Map();
+      prompts.forEach(p => (Array.isArray(p.tags) ? p.tags : []).forEach(t => {
+        const key = String(t).trim().toLowerCase();
+        if (key) counts.set(key, (counts.get(key) || 0) + 1);
+      }));
+      // COMMENT: If the selected tag no longer exists (e.g., all prompts with that tag were deleted), reset to 'all'
+      if (!counts.has(currentTag)) {
+        selected = 'all';
+        PromptUIManager.activeTagFilter = 'all';
+        // COMMENT: Update the tag bar UI to reflect the reset
+        const tagsHost = document.querySelector(`#${SELECTORS.PANEL_CONTENT} .opm-tags-filter-bar`);
+        if (tagsHost) {
+          tagsHost.querySelectorAll('button').forEach(btn => {
+            const isAll = btn.dataset.tag === 'all';
+            btn.setAttribute('aria-pressed', String(isAll));
+          });
+        }
+        PromptStorageManager.saveActiveTagFilter('all');
+      }
+    }
     const input = document.getElementById(SELECTORS.PROMPT_SEARCH_INPUT);
     const term = input ? input.value : '';
     PromptUIManager.filterByTag(selected);
@@ -1369,7 +1393,7 @@ class PromptUIManager {
     PromptUIManager.setPanelHeightMode('fixed');
     // COMMENT: Button container sticks to bottom of the panel
     const btnContainer = createEl('div', { styles: { display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px', marginTop: 'auto', position: 'sticky', bottom: '0', background: 'transparent' } });
-    const submitBtn = createEl('button', { innerHTML: 'Submit', className: `opm-button opm-${getMode()}` });
+    const submitBtn = createEl('button', { innerHTML: '提交', className: `opm-button opm-${getMode()}` });
     submitBtn.addEventListener('click', () => {
       PromptUIManager.inVariableInputMode = false;
       onSubmit(varValues);

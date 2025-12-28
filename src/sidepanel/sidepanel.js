@@ -289,7 +289,7 @@ function displayPrompts(prompts) {
     const copyImg = document.createElement('img');
     copyImg.src = '../icons/copy.png';
     copyImg.alt = 'Copy';
-    copyImg.title = 'Copy to clipboard';
+      copyImg.title = '复制到剪贴板';
     copyImg.width = 14;
     copyImg.height = 14;
     copyImg.style.verticalAlign = 'middle';
@@ -306,7 +306,7 @@ function displayPrompts(prompts) {
     const editImg = document.createElement('img');
     editImg.src = '../icons/edit-icon.png';
     editImg.alt = 'Edit';
-    editImg.title = 'Edit';
+    editImg.title = '编辑';
     editImg.width = 14;
     editImg.height = 14;
     editImg.style.verticalAlign = 'middle';
@@ -318,7 +318,7 @@ function displayPrompts(prompts) {
       document.getElementById('prompt-title').value = prompt.title;
       document.getElementById('prompt-content').value = prompt.content;
       document.getElementById('prompt-index').value = index;
-      document.getElementById('submit-button').textContent = 'Update';
+      document.getElementById('submit-button').textContent = '更新';
       document.getElementById('cancel-edit-button').style.display = 'inline';
     });
     li.appendChild(editBtn);
@@ -328,7 +328,7 @@ function displayPrompts(prompts) {
     const delImg = document.createElement('img');
     delImg.src = '../icons/delete.svg';
     delImg.alt = 'Delete';
-    delImg.title = 'Delete';
+    delImg.title = '删除';
     delImg.width = 18;
     delImg.height = 18;
     delImg.style.verticalAlign = 'middle';
@@ -336,7 +336,7 @@ function displayPrompts(prompts) {
     delBtn.style.backgroundColor = '#ffffff00';
     delBtn.appendChild(delImg);
     delBtn.addEventListener('click', async () => {
-      if (!window.confirm('Are you sure you want to delete this prompt?')) return;
+      if (!window.confirm('您确定要删除此提示词吗？')) return;
       const current = await PromptStorage.getPrompts();
       if (index < 0 || index >= current.length) return;
       await PromptStorage.deletePrompt(current[index].uuid);
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     titleInput.value = '';
     contentInput.value = '';
     promptIndexInput.value = '';
-    submitButton.textContent = 'Save prompt';
+    submitButton.textContent = '保存提示词';
     cancelEditButton.style.display = 'none';
   });
 
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     titleInput.value = '';
     contentInput.value = '';
     promptIndexInput.value = '';
-    submitButton.textContent = 'Add Prompt';
+    submitButton.textContent = '添加提示词';
     cancelEditButton.style.display = 'none';
   });
 
