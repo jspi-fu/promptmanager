@@ -1559,9 +1559,7 @@ class PromptUIManager {
     active: true, 
     id: 'info-banner-v2', // Change ID to re-show to users who dismissed it
     html: `<span>
-      <strong>New:</strong> select text, right click & save as a new prompt! </br></br>
-      Enjoy the extension? 
-      <a href="https://chromewebstore.google.com/detail/open-prompt-manager/gmhaghdbihgenofhnmdbglbkbplolain" target="_blank" rel="noopener noreferrer" style="color:#3674B5;text-decoration:underline;">Leave a review</a>!
+      <strong>更新:</strong> 选中文本可右键保存为提示词 & 提示词生成功能! </br></br>
     </span>`
   };
 

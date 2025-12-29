@@ -78,7 +78,7 @@
       const tagsSet = new Set(Array.isArray(initialTags) ? initialTags : []);
       const row = createEl('div', { className: `opm-tag-row opm-${getMode()}` });
       const pills = createEl('div', { className: 'opm-tags-container' });
-      const input = createEl('input', { attributes: { type: 'text', placeholder: '标签' }, className: `opm-tag-input opm-${getMode()}` });
+      const input = createEl('input', { attributes: { type: 'text', placeholder: '标签(Enter确认)' }, className: `opm-tag-input opm-${getMode()}` });
       const suggestions = createEl('div', { className: `opm-tag-suggestions opm-${getMode()}`, styles: { display: 'none' } });
       let activeIndex = -1; let options = [];
 
@@ -659,7 +659,7 @@
         }));
 
         settings.appendChild(Elements.createToggleRow({
-          labelText: '将提示词追加到文本',
+          labelText: '追加模式',
           tooltipText: '开启后：插入提示词时会追加到输入框末尾，不会覆盖你已输入的内容。',
           getValue: async () => await window.PromptStorageManager.getDisableOverwrite(),
           onToggle: async (active) => { await window.PromptStorageManager.saveDisableOverwrite(active); }
@@ -923,11 +923,11 @@
         };
 
         // COMMENT: Highlight community call-to-actions so users can find GitHub + reviews fast.
-        const communityTitle = createEl('div', { styles: { fontWeight: 'bold', fontSize: '13px', marginTop: '10px', opacity: 0.85 }, innerHTML: 'Support & Links' });
+        const communityTitle = createEl('div', { styles: { fontWeight: 'bold', fontSize: '13px', marginTop: '10px', opacity: 0.85 }, innerHTML: '支持我们的工作' });
         const communityLinks = createEl('div', { styles: { display: 'flex', flexDirection: 'column', gap: '6px' } });
         communityLinks.append(
           createCommunityLink({
-            label: '看看我们的代码仓库',
+            label: '看看我们的开源仓库',
             href: 'https://github.com/jonathanbertholet/promptmanager',
             icon: 'icons/github-icon.png',
             alt: 'GitHub icon'

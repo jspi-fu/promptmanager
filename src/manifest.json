@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "提示词管理器",
-    "version": "2.5.5",
-    "description": "开源提示词管理器，支持 ChatGPT、Claude、Gemini、Grok 等多个 AI 平台。",
+    "name": "PromptMaster",
+    "version": "2.6.0",
+    "description": "开源提示词管理器，支持 ChatGPT、Gemini、豆包、千问 等20个 AI 平台。",
     "permissions": [
         "sidePanel",
         "storage",
