@@ -1,4 +1,4 @@
-# 提示词管理器（Open Prompt Manager）
+# 提示词大师（Prompt Master）
 
 一个轻量级的 Chrome & edge 扩展，用于在多个 AI 平台上**快速管理与插入提示词**，并提供一个内置的“提示词生成器”（OpenAI 兼容接口）辅助生成可复用提示词。
 
