@@ -1,9 +1,9 @@
-## 提示词大师（Prompt Master）— 架构与开发者指南 (v2.6.0)
+## 提示词大师（Prompt Master）— 架构与开发者指南 (v2.6.1)
 
 本文档解释了 `src` 目录中 Chrome 扩展的结构、端到端工作原理以及主要逻辑所在位置。涵盖后台/Service Worker 编排、内容脚本和 UI 层、存储/版本管理、权限引导、侧边栏应用以及提供商集成，并补充“提示词生成器”的实现与数据流。
 
 - 目标：Chrome MV3
-- 核心功能：浮动提示词管理器 UI（按钮或热角）、带标签/文件夹的提示词存储、变量替换、键盘快捷键、侧边栏提示词编辑器、右键上下文菜单、按站点权限、提示词生成器（OpenAI 兼容接口，支持 stream）。
+- 核心功能：浮动提示词大师 UI（按钮或热角）、带标签/文件夹的提示词存储、变量替换、键盘快捷键、侧边栏提示词编辑器、右键上下文菜单、按站点权限、提示词生成器（OpenAI 兼容接口，支持 stream）。
 
 ### 目录概览
 - `src/manifest.json`: 扩展清单文件 (MV3)。
@@ -27,8 +27,8 @@
 ```json
 {
     "manifest_version": 3,
-    "name": "提示词管理器",
-    "version": "2.6.0",
+    "name": "提示词大师",
+    "version": "2.6.1",
     "permissions": ["sidePanel","storage","tabs","scripting","activeTab","contextMenus"],
     "side_panel": { "default_path": "sidepanel/index.html" },
     "background": { "service_worker": "service-worker.js", "type": "module" },
@@ -76,7 +76,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 ```168:235:/src/service-worker.js
 async function createPromptContextMenu() {
   chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({ id: 'open-prompt-manager', title: 'Open Prompt Manager', contexts: ['all'] });
+    chrome.contextMenus.create({ id: 'open-prompt-manager', title: 'Prompt Master', contexts: ['all'] });
     getAllPrompts().then(prompts => prompts.forEach((prompt, idx) => {
       chrome.contextMenus.create({ id: 'prompt-' + idx, parentId: 'open-prompt-manager', title: prompt.title || `Prompt ${idx+1}`, contexts: ['all'] });
     }));
@@ -299,7 +299,7 @@ const handleProviderClick = function (event) {
 - `inputBoxHandler.js`: 强大的站点检测、contentEditable 和 `textarea` 的插入、追加 vs 覆盖。
 - `promptStorage.js`: 版本化存储、规范化/迁移、CRUD、标签、文件夹、导入/导出、更改事件。
 - `llm_providers.json` / `llm_providers.js`: 提供商注册表和运行时加载器。
-- `sidepanel/index.html|sidepanel.js|styles.css`: 独立的提示词管理器面板。
+- `sidepanel/index.html|sidepanel.js|styles.css`: 独立的提示词大师面板。
 - `permissions/permissions.html|permissions.js|permissions_custom.css`: 权限管理 UI。
 - `importExport.js`: 到 `promptStorage` 导入/导出的薄桥接。
 - `utils.js`: `generateUUID` 辅助函数。

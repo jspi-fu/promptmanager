@@ -71,9 +71,9 @@ async function injectScriptsIfNeeded(tabId, tabUrl) {
       target: { tabId: tabId },
       func: () => {
         // Check both markers to ensure all scripts are injected
-        return (window.__promptManagerInjected === true || 
-                window.__promptManagerContentInjected === true ||
-                window.__promptManagerInputHandlerInjected === true);
+        return (window.__promptManagerInjected === true ||
+          window.__promptManagerContentInjected === true ||
+          window.__promptManagerInputHandlerInjected === true);
       }
     });
 
@@ -96,9 +96,9 @@ async function injectScriptsIfNeeded(tabId, tabUrl) {
     return true;
   } catch (injectionError) {
     // Handle specific error cases
-    if (injectionError.message.includes('Cannot access') || 
-        injectionError.message.includes('No matching window') ||
-        injectionError.message.includes('tab was closed')) {
+    if (injectionError.message.includes('Cannot access') ||
+      injectionError.message.includes('No matching window') ||
+      injectionError.message.includes('tab was closed')) {
       // Ignore errors for restricted pages or closed tabs
       return false;
     }
@@ -175,7 +175,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     } catch (err) {
       // Avoid logging errors for URLs like 'chrome://extensions/'
       if (tab.url && !tab.url.startsWith('chrome://')) {
-         // Log errors from getProviders or permission checks
+        // Log errors from getProviders or permission checks
         console.error(`Error during tab update processing for ${tab.url}:`, err);
       }
     }
@@ -247,11 +247,11 @@ async function createPromptContextMenu() {
     // Create the parent menu
     chrome.contextMenus.create({
       id: 'open-prompt-manager',
-      title: '打开提示词管理器',
+      title: '打开提示词大师',
       contexts: ['all']
     });
     // First child: "Save as prompt" – only shown when there is a text selection
-    // COMMENT: This enables the flow "select text → right-click → Open Prompt Manager → Save as prompt"
+    // COMMENT: This enables the flow "select text → right-click → Prompt Master → Save as prompt"
     chrome.contextMenus.create({
       id: 'save-as-prompt',
       parentId: 'open-prompt-manager',

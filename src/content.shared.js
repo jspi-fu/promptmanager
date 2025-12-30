@@ -200,7 +200,9 @@
         },
         createTagsBar({ tags = [], counts = new Map(), onSelect, selectedTag = 'all' } = {}) {
           const bar = createEl('div', { className: `opm-tags-filter-bar opm-${getMode()}` });
-          window.ScrollVisibilityManager?.observe(bar);
+          // COMMENT: Create a wrapper for the tags to allow scroll-vs-wrap behavior
+          const wrapper = createEl('div', { className: 'opm-tags-wrapper' });
+          window.ScrollVisibilityManager?.observe(wrapper);
 
           const makePill = (label, isSelected = false) => {
             const pill = createEl('button', { className: `opm-tag-pill-filter opm-${getMode()}`, attributes: { 'aria-pressed': String(!!isSelected) } });
@@ -211,7 +213,7 @@
           let current = selectedTag || 'all';
           const updateSelected = (nextTag) => {
             current = nextTag;
-            Array.from(bar.children).forEach(child => {
+            Array.from(wrapper.children).forEach(child => {
               const isSelected = child.dataset && child.dataset.tag === current;
               child.setAttribute('aria-pressed', String(isSelected));
             });
@@ -220,15 +222,35 @@
           const allPill = makePill('全部', (selectedTag || 'all') === 'all');
           allPill.dataset.tag = 'all';
           allPill.addEventListener('click', e => { e.stopPropagation(); if (typeof onSelect === 'function') onSelect('all'); updateSelected('all'); });
-          bar.appendChild(allPill);
+          wrapper.appendChild(allPill);
 
           tags.forEach(tag => {
             const count = counts.get(tag) || 0;
             const pill = makePill(count > 0 ? `${tag}` : tag, (selectedTag || 'all') === tag);
             pill.dataset.tag = tag;
             pill.addEventListener('click', e => { e.stopPropagation(); if (typeof onSelect === 'function') onSelect(tag); updateSelected(tag); });
-            bar.appendChild(pill);
+            wrapper.appendChild(pill);
           });
+
+          bar.appendChild(wrapper);
+
+          // COMMENT: Add expand/collapse button
+          const expandBtn = createEl('button', {
+            className: `opm-tags-expand-btn opm-${getMode()}`,
+            innerHTML: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
+            attributes: { 'aria-label': '展开标签', 'title': '展开标签' },
+            eventListeners: {
+              click: (e) => {
+                e.stopPropagation();
+                bar.classList.toggle('opm-expanded');
+                const expanded = bar.classList.contains('opm-expanded');
+                expandBtn.innerHTML = expanded
+                  ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`
+                  : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+              }
+            }
+          });
+          bar.appendChild(expandBtn);
 
           return bar;
         },

@@ -1,3 +1,5 @@
+import { importPrompts } from '../promptStorage.js';
+
 // This script is injected into the page to manage permissions for AI providers
 // It retrieves the providers map from storage and creates elements for each provider
 document.addEventListener('DOMContentLoaded', function () {
@@ -40,28 +42,52 @@ document.addEventListener('DOMContentLoaded', function () {
       const ensureUrlPromise = firstAllowedUrl
         ? Promise.resolve(firstAllowedUrl)
         : fetch(chrome.runtime.getURL('/llm_providers.json'))
-            .then(response => response.json())
-            .then(data => {
-              const llmList = data.llm_providers || [];
-              for (const allowed of allowedProviders) {
-                const match = llmList.find(llm => llm.name === allowed.key);
-                if (match && match.url) {
-                  return match.url;
-                }
+          .then(response => response.json())
+          .then(data => {
+            const llmList = data.llm_providers || [];
+            for (const allowed of allowedProviders) {
+              const match = llmList.find(llm => llm.name === allowed.key);
+              if (match && match.url) {
+                return match.url;
               }
-              return null;
-            });
+            }
+            return null;
+          });
 
       ensureUrlPromise.then(resolvedUrl => {
         if (resolvedUrl) {
-          // Create (or replace) the Get Started button
-          getStartedBtnContainer.innerHTML = `<button id="get-started-btn" class="custom-button" style="font-size: 1.2rem; padding: 0.75rem 1rem; margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-              <img src="../icons/icon-button.png" alt="Open Prompt Manager Icon" width="28" height="28" style="object-fit: cover;"> 
-              <span style="vertical-align: middle;">Get Started</span>
-            </button>`;
+          // Create (or replace) the Get Started buttons
+          getStartedBtnContainer.innerHTML = `
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 16px; margin-top: 1.5rem;">
+              <button id="get-started-best-practices-btn" class="custom-button" style="height: 46px; padding: 0 1.5rem; border-radius: 8px; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.1s;">
+                <img src="../icons/icon-button.png" alt="Icon" width="20" height="20" style="object-fit: cover; filter: brightness(0) invert(1);"> 
+                <span style="font-weight: 500;">从最佳实践开始 (推荐)</span>
+              </button>
+              <button id="get-started-scratch-btn" style="height: 46px; padding: 0 1.5rem; border-radius: 8px; font-size: 1rem; border: 1px solid #e2e8f0; background: #fff; color: #64748b; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center;">
+                从0开始
+              </button>
+            </div>`;
 
-          // Open the provider in a new tab when the button is clicked
-          document.getElementById('get-started-btn').addEventListener('click', () => {
+          // Button 1: Start with Best Practices (Import -> Open)
+          document.getElementById('get-started-best-practices-btn').addEventListener('click', async () => {
+            try {
+              const importUrl = 'https://gitee.com/ye_sheng0839/prompt-master/raw/main/%E9%A2%84%E8%AE%BE%E6%8F%90%E7%A4%BA%E8%AF%8D.json';
+              const response = await fetch(importUrl);
+              if (response.ok) {
+                const text = await response.text();
+                await importPrompts(text);
+                console.log('Successfully imported default prompts.');
+              } else {
+                console.warn('Failed to fetch default prompts:', response.status);
+              }
+            } catch (e) {
+              console.error('Error importing default prompts:', e);
+            }
+            window.open(resolvedUrl, '_blank');
+          });
+
+          // Button 2: Start from Scratch (Just Open)
+          document.getElementById('get-started-scratch-btn').addEventListener('click', () => {
             window.open(resolvedUrl, '_blank');
           });
         }
@@ -183,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Use the helper to populate UI and attach listeners
       populateProviders(providersMap);
-      
+
     } else {
       console.log('No providersMap found in storage.');
       // Handle the case where the map doesn't exist yet
@@ -199,17 +225,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const response = await fetch(chrome.runtime.getURL('/llm_providers.json'));
         const data = await response.json();
         const llmList = data.llm_providers || [];
-        
+
         // Collect all origin patterns
         const allPatterns = llmList
           .map(provider => provider.pattern)
           .filter(Boolean);
-        
+
         if (allPatterns.length === 0) {
           alert('未找到可用的提供者权限模式');
           return;
         }
-        
+
         // Request all permissions at once
         chrome.permissions.request({ origins: allPatterns }, async (granted) => {
           if (granted) {
@@ -217,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
             chrome.storage.local.get(['aiProvidersMap'], (res) => {
               const currentMap = res && res.aiProvidersMap ? res.aiProvidersMap : {};
               const updated = {};
-              
+
               // Update all providers to "Yes" in the map
               for (const provider of llmList) {
                 const key = provider.name;
@@ -236,14 +262,14 @@ document.addEventListener('DOMContentLoaded', function () {
                   };
                 }
               }
-              
+
               // Also preserve any existing providers not in llmList
               for (const [key, val] of Object.entries(currentMap)) {
                 if (!updated[key]) {
                   updated[key] = val;
                 }
               }
-              
+
               chrome.storage.local.set({ aiProvidersMap: updated });
             });
           } else {

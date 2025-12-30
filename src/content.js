@@ -547,6 +547,32 @@
       initializeChat(messagesContainer, input, sendBtn, resetBtn, settingsBtn);
 
       ScrollVisibilityManager.observe(messagesContainer);
+
+      // COMMENT: 首次打开提示词生成器时,若用户尚未配置模型,引导进入配置界面
+      (async () => {
+        try {
+          const result = await new Promise(resolve => {
+            chrome.storage.local.get(['chatApiKey', 'chatConfigGuided'], resolve);
+          });
+          const hasApiKey = result.chatApiKey && result.chatApiKey.trim().length > 0;
+          const hasBeenGuided = result.chatConfigGuided || false;
+
+          // COMMENT: 如果从未配置过API且未被引导过,自动打开设置弹窗
+          if (!hasApiKey && !hasBeenGuided) {
+            // 标记为已引导,避免重复弹窗
+            await new Promise(resolve => {
+              chrome.storage.local.set({ chatConfigGuided: true }, resolve);
+            });
+            // 短暂延迟后弹出,使界面更自然
+            setTimeout(() => {
+              settingsBtn.click();
+            }, 300);
+          }
+        } catch (err) {
+          console.warn('[PromptManager] Failed to check chat config status:', err);
+        }
+      })();
+
       return container;
     };
 
@@ -863,7 +889,7 @@
     const sendMessage = async (userMessage) => {
       const settings = await loadSettings();
       if (!settings.apiKey) {
-        addMessage(messagesContainer, 'assistant', '请先在设置中配置API Key。', false);
+        addMessage(messagesContainer, 'assistant', '您需要在右上角配置正确的模型哦 🔧，在测试连接成功后再与我对话叭', false);
         return;
       }
 
@@ -1007,7 +1033,8 @@
         }
       } catch (error) {
         console.error('[PromptManager] Chat API error:', error);
-        contentDiv.innerHTML = `错误: ${error.message}`;
+        // COMMENT: 统一显示友好的配置引导,避免技术性错误信息吓到用户
+        contentDiv.innerHTML = '您需要在右上角正确配置模型哦 🔧，在测试连接成功后再与我对话叭';
       }
     };
 
@@ -2195,10 +2222,10 @@
             display: 'flex',
             flexDirection: 'column',
             gap: '4px',
-            // COMMENT: Equal splits for 2 or 3 variables; single mode stays compact; list is compact.
-            flex: singleMode ? '0 0 auto' : (splitMode ? '1 1 0%' : '0 0 auto'),
+            // COMMENT: Always auto-height to prevent overflow; container scrolls if needed
+            flex: '0 0 auto',
             // COMMENT: Let flex children shrink properly in split mode
-            minHeight: splitMode ? '0' : 'auto',
+            minHeight: 'auto',
             // COMMENT: Add explicit margin fallback so rows never visually collide if gap is not honored.
             marginBottom: itemGap,
             // COMMENT: Apply list-like vertical padding when many variables
@@ -2231,14 +2258,14 @@
             // COMMENT: Increase vertical padding for a more comfortable input.
             padding: '12px 10px',
             // COMMENT: Taller minima so fields feel more usable without manual resizing.
-            minHeight: listMode ? '18px' : (splitMode ? '60px' : '1px'),
+            minHeight: listMode ? '32px' : '80px',
             // COMMENT: For list mode enforce single-line visual height
-            height: listMode ? '18px' : 'auto',
+            height: listMode ? '32px' : 'auto',
             // COMMENT: Ensure sizing accounts for padding and borders to prevent layout overflow/overlap.
             boxSizing: 'border-box',
             width: '100%',
             // COMMENT: Flex behavior depends on mode: split fills evenly; single & list are compact
-            flex: listMode ? '0 0 auto' : (splitMode ? '1 1 auto' : '0 0 auto'),
+            flex: '1 1 auto',
             resize: (splitMode || listMode) ? 'none' : 'vertical'
           }
         });
@@ -2567,7 +2594,8 @@
   /* Prompt Processor */
   class PromptProcessor {
     static extractVariables(content) {
-      const regex = /#([a-zA-Z0-9_]+)#/g;
+      // COMMENT: Regex updated to support Chinese characters (\u4e00-\u9fa5) in variable names
+      const regex = /#([a-zA-Z0-9_\u4e00-\u9fa5]+)#/g;
       return [...new Set([...content.matchAll(regex)].map(m => m[1]))];
     }
     static replaceVariables(content, values) {

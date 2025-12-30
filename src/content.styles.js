@@ -346,16 +346,62 @@
     #${SELECTORS.ROOT} .opm-tags-filter-bar {
       display: flex;
       flex-direction: row;
+      align-items: flex-start; /* COMMENT: Allow height to grow when expanded */
+      gap: 0; /* Wrapper handles gap */
+      padding: 6px 4px 6px 8px; /* Slightly reduced right padding for button */
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      min-height: 34px;
+      box-sizing: border-box;
+      flex: none;
+      width: 100%;
+    }
+    #${SELECTORS.ROOT} .opm-tags-wrapper {
+      display: flex;
+      flex-direction: row;
       align-items: center;
       gap: 6px;
       overflow-x: auto;
       overflow-y: hidden;
       white-space: nowrap;
-      padding: 6px 8px;
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      min-height: 34px; /* fixed height impact so panel doesn’t jump */
-      box-sizing: border-box;
-      flex: none; /* don’t grow/shrink; keep list area stable */
+      flex: 1; /* Take all available width */
+      scrollbar-width: none; /* Try to hide scrollbar for cleaner look */
+      padding-bottom: 2px; /* Prevent scrollbar overlap with content if visible */
+    }
+    #${SELECTORS.ROOT} .opm-tags-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+    /* Expanded state styles */
+    #${SELECTORS.ROOT} .opm-tags-filter-bar.opm-expanded .opm-tags-wrapper {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      white-space: normal;
+      height: auto;
+      padding-right: 4px; /* Space from button */
+    }
+    /* Expand button styling */
+    #${SELECTORS.ROOT} .opm-tags-expand-btn {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      border-radius: 4px;
+      margin-left: 2px;
+      padding: 0;
+      opacity: 0.6;
+      transition: background-color 0.2s, opacity 0.2s;
+    }
+    #${SELECTORS.ROOT} .opm-tags-expand-btn:hover {
+      background-color: rgba(0,0,0,0.05);
+      opacity: 1;
+    }
+    #${SELECTORS.ROOT}.opm-dark .opm-tags-expand-btn:hover {
+      background-color: rgba(255,255,255,0.1);
     }
     #${SELECTORS.ROOT}.opm-dark .opm-tags-filter-bar { border-bottom-color: rgba(255,255,255,0.12); }
     #${SELECTORS.ROOT} .opm-tag-pill-filter {

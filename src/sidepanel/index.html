@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>提示词管理器</title>
+  <title>提示词大师</title>
   <link rel="stylesheet" href="styles.css" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,11 +10,12 @@
 
 <body>
   <div class="title">
-      <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="../icons/icon-main-s.png">
-        <img class="header-icon" src="../icons/icon-main-s color.png" alt="Extension Icon" style="width: 22px; height: 22px" />
-      </picture>
-    <h2>提示词管理器</h2>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="../icons/icon-main-s.png">
+      <img class="header-icon" src="../icons/icon-main-s color.png" alt="Extension Icon"
+        style="width: 22px; height: 22px" />
+    </picture>
+    <h2>提示词大师</h2>
     <a href="index.html" target="_blank">
       <img id="open-new-tab" class="header-icon" src="../icons/open_in_new.svg" alt="Open in New Tab"
         title="Open in New Tab" />
@@ -36,7 +37,7 @@
     <button id="info-banner-close" class="info-banner-close" aria-label="Dismiss info banner">&times;</button>
     <h3 class="info-banner-title">新版本，新功能！</h3>
     <br />
-    <p class="info-banner-text">您好，</p> 
+    <p class="info-banner-text">您好，</p>
     <br />
     <p class="info-banner-text">虽然不常这样做，但我很高兴与您分享 V2 版本终于发布了！它带来了新功能和改进，并为一些很酷的功能奠定了基础。</p>
     <ul class="info-banner-list">
@@ -44,15 +45,18 @@
       <li>新 LLM 的权限管理器。</li>
       <li>响应式侧边栏用于编写提示词。</li>
       <li>从侧边栏和右键菜单复制和粘贴。</li>
-      <li>新设置：将提示词追加到输入框。</li> 
-      <li>现在看起来比以往任何时候都更好，支持明暗模式。</li>      
+      <li>新设置：将提示词追加到输入框。</li>
+      <li>现在看起来比以往任何时候都更好，支持明暗模式。</li>
     </ul>
     <br />
-    <p class="info-banner-text">权限管理可通过侧边栏右下角的<strong><a href="../permissions/permissions.html" target="_blank">锁定图标</a></strong>进行管理。</p>
+    <p class="info-banner-text">权限管理可通过侧边栏右下角的<strong><a href="../permissions/permissions.html"
+          target="_blank">锁定图标</a></strong>进行管理。</p>
     <br />
     <p class="info-banner-text">对于许多给予支持、分享反馈和使用此扩展的用户，我想借此机会说声<strong>谢谢</strong>。</p>
     <br />
-    <p class="info-banner-text">欢迎在 Chrome 网上应用店为<a href="https://chromewebstore.google.com/detail/open-prompt-manager/gmhaghdbihgenofhnmdbglbkbplolain" target="_blank">提示词管理器</a>留下评价。</p>
+    <p class="info-banner-text">欢迎在 Chrome 网上应用店为<a
+        href="https://chromewebstore.google.com/detail/open-prompt-manager/gmhaghdbihgenofhnmdbglbkbplolain"
+        target="_blank">提示词大师</a>留下评价。</p>
     <br />
     <p class="info-banner-text">再次感谢！</p>
   </div>
@@ -105,7 +109,7 @@
                 padding: 4px 8px;
                 border-radius: 4px;
                 margin-right: 10px;
-              ">Esc</span> <span>关闭提示词管理器</span> </p>
+              ">Esc</span> <span>关闭提示词大师</span> </p>
       </div>
     </div>
   </div>
@@ -120,7 +124,8 @@
     </div>
     <div class="llms-group">
       <!-- COMMENT: Available section is foldable; collapsed by default -->
-      <div class="llms-subheading" id="llms-available-toggle" role="button" tabindex="0" aria-controls="llms-available" aria-expanded="false">添加更多</div>
+      <div class="llms-subheading" id="llms-available-toggle" role="button" tabindex="0" aria-controls="llms-available"
+        aria-expanded="false">添加更多</div>
       <div id="llms-available" class="llms-pills collapsible" aria-live="polite">
         <!-- COMMENT: Available provider pills rendered here (click to request permission) -->
       </div>
@@ -128,7 +133,8 @@
   </div>
   <!-- COMMENT: Prompt Management section with fold/unfold, folded by default -->
   <div id="pm-section" class="llms-section">
-    <h3 class="llms-heading" id="pm-toggle" role="button" tabindex="0" aria-controls="pm-controls" aria-expanded="false">设置</h3>
+    <h3 class="llms-heading" id="pm-toggle" role="button" tabindex="0" aria-controls="pm-controls"
+      aria-expanded="false">设置</h3>
     <div class="llms-group">
       <div id="pm-controls" class="pm-controls collapsible" aria-live="polite">
         <div class="pm-subtitle">管理您保存的提示词。</div>
@@ -145,12 +151,11 @@
   <!-- Sticky footer for icons/links -->
   <footer class="footer">
     <div class="footer-icons" style="display: flex; align-items: center; gap: 8px;">
-      <a id="link" href="https://gitee.com/ye_sheng0839/prompt-master"
-        target="_blank" title="Gitee"><img class="footer-icons" src="../icons/gitee.svg" alt="Gitee" /></a>
+      <a id="link" href="https://gitee.com/ye_sheng0839/prompt-master" target="_blank" title="Gitee"><img
+          class="footer-icons" src="../icons/gitee.svg" alt="Gitee" /></a>
       <!-- COMMENT: Buy Me a Coffee link inserted between Gitee and Chrome Web Store -->
-      <a id="link" href="https://buymeacoffee.com/jonathanbertholet"
-        target="_blank" title="给原作者一键三连~">
-          <span style="
+      <a id="link" href="https://buymeacoffee.com/jonathanbertholet" target="_blank" title="给原作者一键三连~">
+        <span style="
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -159,14 +164,16 @@
             border-radius: 50%;
             background: #3674B5;
           ">
-            <img class="footer-icons" src="../icons/coffee.svg" alt="给原作者一键三连~" style="width: 12px; height: 12px; filter: brightness(0) invert(1);" />
-          </span>
-        </a>
-      <a id="link" href="https://gitee.com/ye_sheng0839/prompt-master/issues"
-        target="_blank" title="留下你的反馈"><img class="footer-icons" src="../icons/review-icon.png" alt="留下你的反馈" /></a>
+          <img class="footer-icons" src="../icons/coffee.svg" alt="给原作者一键三连~"
+            style="width: 12px; height: 12px; filter: brightness(0) invert(1);" />
+        </span>
+      </a>
+      <a id="link" href="https://gitee.com/ye_sheng0839/prompt-master/issues" target="_blank" title="留下你的反馈"><img
+          class="footer-icons" src="../icons/review-icon.png" alt="留下你的反馈" /></a>
       <a id="link" href="../settings.html" title="Settings"><img id="settings-icon" class="footer-icons"
           src="../icons/settings-icon.png" alt="Settings" /></a>
-      <a id="link" href="../permissions/permissions.html" title="Get Started" target="_blank" style="text-decoration: none;">
+      <a id="link" href="../permissions/permissions.html" title="Get Started" target="_blank"
+        style="text-decoration: none;">
         <span style="
           display: inline-flex;
           align-items: center;
