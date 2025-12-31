@@ -104,14 +104,14 @@ static async saveMyNewSetting(value) {
 }
 ```
 
-**位置**：`src/content.js` 第 1374-1483 行
+**位置**：`src/content.js` 第 1570-1575 行
 
 #### 步骤 2：在设置表单中添加 UI 控件
 
 在 `src/content.shared.js` 的 `createSettingsForm()` 方法中添加设置项：
 
 ```javascript
-// 在 createSettingsForm() 方法中添加（约 646-687 行）
+// 在 createSettingsForm() 方法中添加（约 711-740 行）
 settings.appendChild(Elements.createToggleRow({
   labelText: '我的新设置',
   tooltipText: '这是设置的说明文字，鼠标悬浮在 ? 上可查看',
@@ -127,7 +127,7 @@ settings.appendChild(Elements.createToggleRow({
 - `Elements.createToggleRow()`：开关切换（布尔值）
 - 如需其他类型（输入框、下拉框等），可参考现有实现或扩展 `Elements` 对象
 
-**位置**：`src/content.shared.js` 第 646-687 行
+**位置**：`src/content.shared.js` 第 711-790 行
 
 #### 步骤 3：在需要的地方使用设置值
 
@@ -198,7 +198,7 @@ var THEME_COLORS = window.THEME_COLORS || {
 
 #### 修改全局 CSS 样式
 
-在 `src/content.styles.js` 的 `injectGlobalStyles()` 函数中修改 CSS（约第 68-967 行）：
+在 `src/content.styles.js` 的 `injectGlobalStyles()` 函数中修改 CSS（约第 68-1013 行）：
 
 ```javascript
 var injectGlobalStyles = window.injectGlobalStyles || function injectGlobalStyles() {
@@ -235,7 +235,7 @@ var injectGlobalStyles = window.injectGlobalStyles || function injectGlobalStyle
 
 #### 修改默认快捷键
 
-在 `src/content.js` 的 `PromptStorageManager.getKeyboardShortcut()` 方法中（约第 1431-1438 行）：
+在 `src/content.js` 的 `PromptStorageManager.getKeyboardShortcut()` 方法中（约第 1570-1575 行）：
 
 ```javascript
 static async getKeyboardShortcut() {
@@ -250,7 +250,7 @@ static async getKeyboardShortcut() {
 
 #### 修改快捷键处理逻辑
 
-在 `src/content.js` 的 `KeyboardManager._onKeyDown()` 方法中（约第 1292-1311 行）：
+在 `src/content.js` 的 `KeyboardManager._onKeyDown()` 方法中（约第 1431-1450 行）：
 
 ```javascript
 static async _onKeyDown(e) {
@@ -287,7 +287,7 @@ static async _onKeyDown(e) {
 
 #### 步骤 1：定义新视图常量
 
-在 `src/content.js` 的 `PanelView` 对象中添加新视图（约第 336 行附近）：
+在 `src/content.js` 的 `PanelView` 对象中添加新视图（约第 292 行附近）：
 
 ```javascript
 const PanelView = {
@@ -304,7 +304,7 @@ const PanelView = {
 
 #### 步骤 2：创建视图构建函数
 
-在 `PanelRouter` 中添加视图构建函数（约第 658 行附近）：
+在 `PanelRouter` 中添加视图构建函数（约第 336-665 行）：
 
 ```javascript
 const PanelRouter = (() => {
@@ -331,7 +331,7 @@ const PanelRouter = (() => {
 
 #### 步骤 3：注册视图到路由
 
-在 `PanelRouter` 的视图映射中添加新视图（约第 658 行附近）：
+在 `PanelRouter` 的视图映射中添加新视图（约第 336 行附近）：
 
 ```javascript
 const builders = {
@@ -508,7 +508,7 @@ if (inputBox.classList.contains('my-editor')) {
 
 #### 修改默认配置
 
-在 `initializeChat()` 函数的 `loadSettings()` 中（约第 730-740 行）：
+在 `initializeChat()` 函数的 `loadSettings()` 中（约第 756-767 行）：
 
 ```javascript
 const loadSettings = () => {
@@ -516,8 +516,8 @@ const loadSettings = () => {
     chrome.storage.local.get(['chatApiKey', 'chatBaseUrl', 'chatModelName'], (result) => {
       resolve({
         apiKey: result.chatApiKey || '',
-        baseUrl: result.chatBaseUrl || 'https://api.openai.com/v1', // 修改默认 Base URL
-        modelName: result.chatModelName || 'gpt-4' // 修改默认模型
+        baseUrl: result.chatBaseUrl || 'https://openrouter.ai/api/v1', // 修改默认 Base URL
+        modelName: result.chatModelName || 'nex-agi/deepseek-v3.1-nex-n1:free' // 修改默认模型
       });
     });
   });
@@ -526,7 +526,7 @@ const loadSettings = () => {
 
 #### 修改 API 请求格式
 
-如果需要修改 API 请求格式，在 `initializeChat()` 的发送消息部分（约第 800-900 行）：
+如果需要修改 API 请求格式，在 `initializeChat()` 的发送消息部分（约第 906-918 行）：
 
 ```javascript
 const response = await fetch(`${settings.baseUrl}/chat/completions`, {
@@ -548,7 +548,7 @@ const response = await fetch(`${settings.baseUrl}/chat/completions`, {
 
 #### 修改流式响应解析
 
-如果需要修改 SSE 数据解析逻辑（约第 900-1000 行）：
+
 
 ```javascript
 const reader = response.body.getReader();
@@ -592,7 +592,7 @@ while (true) {
 
 #### 在 `Elements` 对象中添加新组件
 
-在 `src/content.shared.js` 的 `Elements` 对象中添加新组件方法（约第 340-386 行）：
+在 `src/content.shared.js` 的 `Elements` 对象中添加新组件方法（约第 197-424 行）：
 
 ```javascript
 const Elements = {
@@ -694,12 +694,12 @@ A:
 |------|---------|---------|
 | 平台配置 | `src/llm_providers.json` | 全部 |
 | 输入框处理 | `src/inputBoxHandler.js` | 第 22-364 行 |
-| 设置 UI | `src/content.shared.js` | 第 646-687 行 |
-| 设置存储 | `src/content.js` | 第 1374-1483 行 |
-| 样式主题 | `src/content.styles.js` | 第 18-967 行 |
-| 路由视图 | `src/content.js` | 第 336-706 行 |
+| 设置 UI | `src/content.shared.js` | 第 711-1015 行 |
+| 设置存储 | `src/content.js` | 第 1570-1575 行 |
+| 样式主题 | `src/content.styles.js` | 第 18-1013 行 |
+| 路由视图 | `src/content.js` | 第 292-659 行 |
 | 存储核心 | `src/promptStorage.js` | 全部 |
-| 提示词生成器 | `src/content.js` | 第 712-1251 行 |
+| 提示词生成器 | `src/content.js` | 第 379-1039 行 |
 | UI 组件 | `src/content.shared.js` | 第 340-386 行 |
 
 ---
@@ -716,6 +716,6 @@ A:
 
 ---
 
-**最后更新**：2025-01-27
-**版本**：v2.6.0
+**最后更新**：2025-12-31
+**版本**：v2.6.2
 
