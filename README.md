@@ -76,5 +76,5 @@ MIT
 ## 致谢
 
 - 本项目基于[Open Prompt Manager](https://github.com/jonathanbertholet/promptmanager)进行重构、汉化、功能升级与性能优化，感谢原始开发团队提供的优秀模板，项目中的打赏通道将永远留给他们！
-- 感谢由[Lyra 4D]（https://lyraprompt.com/）提供的优质提示词策略与评分机制！
+- 感谢由[Lyra 4D](https://lyraprompt.com/)提供的优质提示词策略与评分机制！
 - 部分功能与bug修复已向原始项目提交PR
