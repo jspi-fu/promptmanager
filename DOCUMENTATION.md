@@ -1,4 +1,4 @@
-## 提示词大师（Prompt Master）— 架构与开发者指南 (v2.6.2)
+## 提示词大师（Prompt Master）— 架构与开发者指南 (v2.6.3)
 
 本文档解释了 `src` 目录中 Chrome 扩展的结构、端到端工作原理以及主要逻辑所在位置。涵盖后台/Service Worker 编排、内容脚本和 UI 层、存储/版本管理、权限引导、侧边栏应用以及提供商集成，并补充“提示词生成器”的实现与数据流。
 
@@ -28,7 +28,7 @@
 {
     "manifest_version": 3,
     "name": "提示词大师",
-    "version": "2.6.2",
+    "version": "2.6.3",
     "permissions": ["sidePanel","storage","tabs","scripting","activeTab","contextMenus"],
     "side_panel": { "default_path": "sidepanel/index.html" },
     "background": { "service_worker": "service-worker.js", "type": "module" },

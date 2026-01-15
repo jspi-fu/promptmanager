@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "default_locale": "zh_CN",
     "name": "PromptMaster",
-    "version": "2.6.2",
+    "version": "2.6.3",
     "description": "开源提示词管理器，拥有跨AI平台提示词管理、提示词生成、提示词市场等功能，支持 ChatGPT、Gemini、豆包、千问 等20个 AI 平台。",
     "permissions": [
         "sidePanel",
