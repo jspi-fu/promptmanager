@@ -1,6 +1,6 @@
 {
-    "name": "chrome-extension-automation",
-    "version": "1.0.0",
+    "name": "prompt-master",
+    "version": "2.7.1",
     "dependencies": {
         "jest": "^29.7.0",
         "puppeteer": "^24.4.0"
