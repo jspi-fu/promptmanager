@@ -33,7 +33,7 @@
       edit: `<img src="${chrome.runtime.getURL('icons/edit.svg')}" width="16" height="16" alt="${chrome.i18n.getMessage('edit')}" title="${chrome.i18n.getMessage('edit')}" style="filter: ${iconFilter()}">`,
       settings: `<img src="${chrome.runtime.getURL('icons/settings.svg')}" width="16" height="16" alt="${chrome.i18n.getMessage('settings')}" title="${chrome.i18n.getMessage('settings')}" style="filter: ${iconFilter()}">`,
       help: `<img src="${chrome.runtime.getURL('icons/help.svg')}" width="16" height="16" alt="${chrome.i18n.getMessage('help')}" title="${chrome.i18n.getMessage('help')}" style="filter: ${iconFilter()}">`,
-      chat: `<img src="${chrome.runtime.getURL('icons/chatllm.png')}" width="16" height="16" alt="${chrome.i18n.getMessage('promptGeneration')}" title="${chrome.i18n.getMessage('promptGeneration')}" style="filter: ${iconFilter()}">`,
+      chat: `<img src="${chrome.runtime.getURL('icons/prompt-generator.svg')}" width="16" height="16" alt="${chrome.i18n.getMessage('promptGeneration')}" title="${chrome.i18n.getMessage('promptGeneration')}" style="filter: ${iconFilter()}">`,
     };
 
     const TagService = (() => {

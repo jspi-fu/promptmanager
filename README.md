@@ -1,13 +1,20 @@
-# 提示词大师（Prompt Master）
+![Cover](assets/Cover.png)
+<div align="center">
+  <a href="https://gitee.com/ye_sheng0839/awesome-prompts/stargazers"><img src="https://gitee.com/ye_sheng0839/awesome-prompts/badge/star.svg?theme=dark" alt="Stars"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/promptmaster/decdbjbmghcogkbpjpfknillkabahdni"><img src="https://img.shields.io/badge/Microsoft_Edge-0078D7?style=flat&logo=microsoft-edge&logoColor=white" alt="Edge Add-ons"></a>
+</div>
 
-一个轻量级的 Chrome & edge 扩展，用于在多个 AI 平台上**快速管理与插入提示词**，并提供一个内置的“提示词生成器”（OpenAI 兼容接口）辅助生成可复用提示词。
+一个轻量级的 Chrome & Edge 扩展，用于在多个 AI 平台上**快速管理与插入提示词**，并提供一个内置的"提示词生成器"（OpenAI 兼容接口）辅助生成可复用提示词。
 
-[**点击获取edge插件**](https://microsoftedge.microsoft.com/addons/detail/promptmaster/decdbjbmghcogkbpjpfknillkabahdni)
+<div align="center">
+  [**点击获取Edge插件**](https://microsoftedge.microsoft.com/addons/detail/promptmaster/decdbjbmghcogkbpjpfknillkabahdni)
+</div>
 
 ## 界面示例
-![UseinAI](public/UseinAI.png)
-![UsefromBP](public/UsefromBP.png)
-![UsePromptcreate](public/UsePromptcreate.png)
+![UseinAI](assets/UseinAI.png)
+![UsefromBP](assets/UsefromBP.png)
+![UsePromptcreate](assets/UsePromptcreate.png)
 
 
 ## 功能概览
@@ -40,9 +47,12 @@
 
 ### 安装（开发者模式）
 
-1. 打开 `chrome://extensions/`，启用“开发者模式”
-2. 点击“加载已解压的扩展程序”，选择本项目 `src/` 目录
-3. 打开任意支持平台页面，在权限管理器中授予对应站点权限（可选主机权限）
+1. 下载项目代码到本地
+2. 打开 `chrome://extensions/`，启用“开发者模式”
+3. 点击“加载已解压的扩展程序”，选择本项目 `src/` 目录
+4. 打开任意支持平台页面，在权限管理器中授予对应站点权限（可选主机权限）
+
+> 普通用户直接从[Edge插件市场](https://microsoftedge.microsoft.com/addons/detail/promptmaster/decdbjbmghcogkbpjpfknillkabahdni)安装即可。
 
 ### 键盘快捷键
 

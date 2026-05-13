@@ -417,12 +417,15 @@
 
       const icon = createEl('img', {
         attributes: {
-          src: chrome.runtime.getURL('icons/chatllm.png'),
-          alt: 'Lyra',
-          width: '24',
-          height: '24'
+          src: chrome.runtime.getURL('icons/prompt-generator.svg'),
+          alt: 'Prompt Generator'
         },
-        styles: { borderRadius: '4px' }
+        styles: { 
+          width: '16px',
+          height: '16px',
+          borderRadius: '4px',
+          filter: getIconFilter()
+        }
       });
 
       const title = createEl('div', {
