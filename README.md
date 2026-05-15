@@ -7,8 +7,9 @@
 
 一款"小而美"的浏览器扩展，用于在多个 AI 平台上**快速管理与插入提示词**，并提供一个内置的"提示词生成器"辅助生成可复用提示词，具有多项**用户友好**的特色功能！
 
-![Advert](assets/advert.png)
 <div align="center">
+  <img src="https://ik.imagekit.io/a3keouazok/ad.png" alt="Advert">
+  <br>
   <a href="https://microsoftedge.microsoft.com/addons/detail/promptmaster/decdbjbmghcogkbpjpfknillkabahdni"><strong>点击获取Edge插件</strong></a>
 </div>
 
