@@ -241,9 +241,24 @@ html::-webkit-scrollbar {
     margin-bottom: 18px;
   }
 
+  .form-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .form-buttons #cancel-edit-button {
+    flex: 1;
+    margin-top: 0;
+  }
+
+  .form-buttons #submit-button {
+    flex: 1;
+  }
+
   #cancel-edit-button {
-    background-color: #dfdfdf;
-    color: var(--primary);
+    background-color: #9CA3AF;
+    color: white;
     border: none;
     padding: 10px 20px;
     text-align: center;
@@ -251,16 +266,12 @@ html::-webkit-scrollbar {
     display: inline-block;
     font-size: 13px;
     border-radius: 8px;
-
-    /* Rounded corners */
-    margin-top: 8px;
-    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
   #cancel-edit-button:hover {
-    background-color: #c0c0c0;
-    cursor: pointer;
-    border-color: var(--primary);
+    background-color: #6B7280;
   }
 
   .title {

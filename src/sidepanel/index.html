@@ -32,12 +32,14 @@
         <input type="text" id="tag-input" data-i18n-placeholder="tagInputPlaceholder" />
       </div>
     </div>
-    <button class="main" type="submit" id="submit-button">
-      <img src="../icons/add-icon.png" data-i18n-alt="add" style="margin-right: 5px" />
-      <span data-i18n="savePrompt"></span>
-    </button>
-    <button type="button" id="cancel-edit-button" style="display: none" data-i18n="cancel">
-    </button>
+    <div class="form-buttons">
+      <button type="button" id="cancel-edit-button" style="display: none" data-i18n="cancel">
+      </button>
+      <button class="main" type="submit" id="submit-button">
+        <img src="../icons/add-icon.png" data-i18n-alt="add" style="margin-right: 5px" />
+        <span data-i18n="savePrompt"></span>
+      </button>
+    </div>
   </form>
   <div id="info-banner" class="info-banner" role="status" aria-live="polite">
     <button id="info-banner-close" class="info-banner-close" aria-label="Dismiss info banner">&times;</button>

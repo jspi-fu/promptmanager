@@ -2287,18 +2287,18 @@
       // COMMENT: Ensure non-list view uses fixed height
       PromptUIManager.setPanelHeightMode('fixed');
       // COMMENT: Button container sticks to bottom of the panel
-      const btnContainer = createEl('div', { styles: { display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px', marginTop: 'auto', position: 'sticky', bottom: '0', background: 'transparent' } });
-      const submitBtn = createEl('button', { innerHTML: '提交', className: `opm-button opm-${getMode()}` });
-      submitBtn.addEventListener('click', () => {
-        PromptUIManager.inVariableInputMode = false;
-        onSubmit(varValues);
-      });
-      const backBtn = createEl('button', { innerHTML: 'Back', className: `opm-button opm-${getMode()}` });
+      const btnContainer = createEl('div', { styles: { display: 'flex', gap: '8px', marginTop: '8px', marginTop: 'auto', position: 'sticky', bottom: '0', background: 'transparent' } });
+      const backBtn = createEl('button', { innerHTML: '返回', className: `opm-button opm-${getMode()}`, styles: { backgroundColor: '#9CA3AF', flex: '1' } });
       backBtn.addEventListener('click', () => {
         PromptUIManager.inVariableInputMode = false;
         PanelRouter.mount(PanelView.LIST);
       });
-      btnContainer.append(submitBtn, backBtn);
+      const submitBtn = createEl('button', { innerHTML: '确定', className: `opm-button opm-${getMode()}`, styles: { flex: '1' } });
+      submitBtn.addEventListener('click', () => {
+        PromptUIManager.inVariableInputMode = false;
+        onSubmit(varValues);
+      });
+      btnContainer.append(backBtn, submitBtn);
       form.appendChild(btnContainer);
       requestAnimationFrame(() => {
         const firstInput = varContainer.querySelector('textarea, input');
